@@ -3,207 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tatu Chords Pro - IPAD FIX</title>
+    <title>Tatu Chords Pro</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* CSS DE ALTA COMPATIBILIDADE PARA IOS 12 */
+        /* FIX TOTAL PARA IOS 12 */
         body { 
-            font-family: Helvetica, Arial, sans-serif; 
+            font-family: 'Inter', Helvetica, Arial, sans-serif; 
             background-color: #020617; 
             color: #f1f5f9; 
-            margin: 0; 
-            padding: 0;
-            -webkit-text-size-adjust: 100%;
+            margin: 0;
         }
 
-        /* Forçar esconder as seções que não estão ativas */
+        /* Forçar o sumiço das abas inativas (evita que uma fique em cima da outra) */
         .tab-content { display: none !important; }
         .tab-content.active { display: block !important; }
 
         /* Estilo das Abas */
-        .nav-container { 
-            display: flex; 
-            background: #0f172a; 
-            margin: 10px; 
-            border-radius: 8px; 
-            border: 1px solid #334155;
-            overflow: hidden;
-        }
-        .nav-item { 
-            flex: 1; 
-            padding: 15px; 
-            text-align: center; 
-            font-weight: bold; 
-            color: #94a3b8;
-            cursor: pointer;
-        }
-        .nav-item.active { 
-            background: #22c55e; 
-            color: #000; 
-        }
+        .nav-bar { display: flex; background: #0f172a; margin: 10px; border-radius: 10px; border: 1px solid #1e293b; overflow: hidden; }
+        .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: bold; cursor: pointer; color: #94a3b8; }
+        .nav-item.active { background: #22c55e; color: #000; }
 
-        /* Botões e Inputs Compatíveis */
-        .btn-base { 
-            padding: 12px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            border: none; 
-            text-align: center;
-            display: inline-block;
-            text-decoration: none;
-        }
+        /* Botões e Inputs */
+        .btn-ui { padding: 10px 15px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; display: inline-block; text-align: center; font-size: 14px; }
         .btn-green { background: #22c55e; color: #000; }
         .btn-blue { background: #3b82f6; color: #fff; }
-        .btn-outline { background: transparent; border: 1px solid #475569; color: #fff; }
+        .btn-ghost { background: transparent; border: 1px solid #334155; color: #fff; }
+        .btn-red { background: #ef4444; color: #fff; }
         
-        .input-dark { 
-            background: #000; 
-            border: 1px solid #334155; 
-            color: #fff; 
-            padding: 12px; 
-            width: 100%; 
-            border-radius: 8px; 
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
+        .input-ui { background: #000; border: 1px solid #334155; color: #fff; padding: 12px; width: 100%; border-radius: 8px; margin-bottom: 8px; box-sizing: border-box; }
 
-        /* Listagem de Músicas */
-        .song-card { 
-            background: #0f172a; 
-            border: 1px solid #1e293b; 
-            padding: 15px; 
-            border-radius: 12px; 
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        /* Grid de Músicas */
+        .card-song { background: #0f172a; border: 1px solid #1e293b; padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Player de Performance (Fix para iOS 12) */
-        #show-play-screen { 
-            position: fixed; 
-            top: 0; left: 0; right: 0; bottom: 0; 
-            background: #000; 
-            z-index: 9999; 
-            display: none; 
-            flex-direction: column; 
-        }
+        /* Player Fixo */
+        #show-play-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 9999; display: none; flex-direction: column; }
         #show-play-screen.active { display: flex !important; }
+        .player-bar { background: #0f172a; padding: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
 
-        .player-header, .player-footer { 
-            background: #0f172a; 
-            padding: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            border-bottom: 1px solid #334155;
-        }
+        /* Renderização da Cifra */
+        .chord { color: #4ade80; font-weight: bold; font-family: 'Courier New', Courier, monospace; }
+        .lyric-line { color: #fff; margin-bottom: 2px; line-height: 1.2; }
+        .verse-block { margin-bottom: 1.5rem; break-inside: avoid; -webkit-column-break-inside: avoid; }
+        .lyrics-container { column-gap: 2rem; column-fill: auto; }
+        .note-box { color: #f87171; font-style: italic; border-left: 4px solid #f87171; padding: 5px 10px; margin: 10px 0; background: rgba(248, 113, 113, 0.1); }
 
-        /* Cifras */
-        .chord { color: #4ade80; font-weight: bold; font-family: 'Courier New', monospace; }
-        .lyric-line { color: #fff; font-size: 1.1em; margin-bottom: 4px; }
-        .verse-block { margin-bottom: 20px; break-inside: avoid; }
-        .lyrics-container { column-gap: 20px; column-fill: auto; }
-        
         /* Modal */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-            background: rgba(0,0,0,0.9); z-index: 10000; 
-            display: none; align-items: center; justify-content: center; 
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .modal-content { background: #0f172a; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; border: 1px solid #334155; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
-<div id="main-ui">
-    <header style="padding: 20px; text-align: center;">
-        <h1 style="color: #4ade80; font-size: 24px; font-weight: bold;">TATU CHORDS PRO</h1>
+<div id="main-ui-wrapper">
+    <header style="text-align: center; padding: 15px;">
+        <h1 style="color: #4ade80; font-size: 22px; font-weight: bold; letter-spacing: -1px;">TATU CHORDS PRO</h1>
     </header>
 
-    <!-- Navegação -->
-    <div class="nav-container">
+    <div class="nav-bar">
         <div class="nav-item active" id="btn-tab-musicas" onclick="setTab('musicas')">Músicas</div>
         <div class="nav-item" id="btn-tab-shows" onclick="setTab('shows')">Shows</div>
         <div class="nav-item" id="btn-tab-editor" onclick="setTab('editor')">Editor</div>
     </div>
 
     <!-- ABA: MÚSICAS -->
-    <section id="tab-musicas" class="tab-content active" style="padding: 0 15px;">
-        <input type="text" id="search-input" placeholder="Buscar música ou artista..." class="input-dark" oninput="searchSongs()">
-        <div id="artist-tabs" style="display: flex; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px;"></div>
+    <section id="tab-musicas" class="tab-content active" style="padding: 10px;">
+        <input type="text" id="search-input" placeholder="Buscar música ou artista..." class="input-ui" oninput="searchSongs()">
+        <div id="artist-tabs" style="display: flex; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px; -webkit-overflow-scrolling: touch;"></div>
         <div id="biblioteca-list"></div>
     </section>
 
     <!-- ABA: SHOWS -->
-    <section id="tab-shows" class="tab-content" style="padding: 0 15px;">
+    <section id="tab-shows" class="tab-content" style="padding: 10px;">
         <div style="display: flex; margin-bottom: 15px;">
-            <button class="btn-base btn-blue" style="flex: 1; margin-right: 10px;" onclick="createShow()">➕ Novo Show</button>
-            <button class="btn-base btn-outline" onclick="exportarMasterApp()">GERAR APP IPAD</button>
+            <button class="btn-ui btn-blue" style="flex: 2; margin-right: 8px;" onclick="createShow()">➕ Novo Show</button>
+            <button class="btn-ui btn-ghost" style="flex: 1;" onclick="exportarMasterApp()">EXPORTAR</button>
         </div>
         <div id="shows-list"></div>
     </section>
 
     <!-- ABA: EDITOR -->
-    <section id="tab-editor" class="tab-content" style="padding: 0 15px;">
-        <div style="background: #0f172a; padding: 15px; border-radius: 12px;">
-            <input id="ed-title" placeholder="Título" class="input-dark">
-            <input id="ed-artist" placeholder="Artista" class="input-dark">
-            <div style="display: flex;">
-                <input id="ed-key" placeholder="Tom" class="input-dark" style="margin-right: 10px; color: #4ade80;">
-                <input id="ed-preset" placeholder="Preset POD" class="input-dark">
+    <section id="tab-editor" class="tab-content" style="padding: 10px;">
+        <div style="background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid #1e293b;">
+            <div style="display: flex; margin-bottom: 8px;">
+                <input id="ed-title" placeholder="Título" class="input-ui" style="margin-right: 5px;">
+                <input id="ed-artist" placeholder="Artista" class="input-ui">
             </div>
-            <textarea id="ed-cifra" oninput="updateEditorPreview()" placeholder="Cifra aqui..." class="input-dark" style="height: 200px; font-family: monospace;"></textarea>
+            <div style="display: flex; margin-bottom: 8px;">
+                <input id="ed-key" placeholder="Tom" class="input-ui" style="margin-right: 5px; color: #4ade80; font-weight: bold;">
+                <input id="ed-preset" placeholder="Preset POD" class="input-ui">
+            </div>
+            <textarea id="ed-cifra" oninput="updateEditorPreview()" placeholder="Cifra aqui..." class="input-ui" style="height: 180px; font-family: monospace; font-size: 14px;"></textarea>
             
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <button class="btn-base btn-outline" onclick="setEdCols(1)">1 Col</button>
-                <button class="btn-base btn-outline" onclick="setEdCols(2)">2 Col</button>
+            <!-- Barra de Ferramentas do Editor (RESTORED) -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #000; padding: 8px; border-radius: 8px;">
+                <div style="display: flex;">
+                    <button class="btn-ui btn-ghost" style="padding: 5px 12px; margin-right: 5px;" onclick="changeEdFont(-2)">A-</button>
+                    <button class="btn-ui btn-ghost" style="padding: 5px 12px;" onclick="changeEdFont(2)">A+</button>
+                </div>
+                <div style="display: flex;">
+                    <button class="btn-ui btn-ghost" style="padding: 5px 12px; margin-right: 5px;" onclick="setEdCols(1)">1 Col</button>
+                    <button class="btn-ui btn-ghost" style="padding: 5px 12px;" onclick="setEdCols(2)">2 Col</button>
+                </div>
             </div>
 
-            <div id="editor-preview" style="background: #000; padding: 15px; border-radius: 8px; min-height: 150px; margin-bottom: 15px;"></div>
+            <div id="editor-preview" style="background: #000; padding: 15px; border-radius: 8px; min-height: 100px; margin-bottom: 15px; overflow: auto;"></div>
             
-            <button class="btn-base btn-green" style="width: 100%;" onclick="saveToLibrary()">💾 Salvar na Biblioteca</button>
+            <div style="display: flex;">
+                <button class="btn-ui btn-green" style="flex: 1; margin-right: 8px;" onclick="saveToLibrary()">💾 Salvar</button>
+                <button class="btn-ui btn-ghost" onclick="clearEditor()">Limpar</button>
+            </div>
         </div>
     </section>
 </div>
 
 <!-- PLAYER -->
 <div id="show-play-screen">
-    <div class="player-header">
+    <div class="player-bar">
         <div style="display: flex; align-items: center;">
-            <button onclick="backToMenu()" style="background: none; border: none; color: #fff; font-size: 24px; margin-right: 15px;">✕</button>
+            <button onclick="backToMenu()" style="background: none; border: none; color: #fff; font-size: 26px; margin-right: 15px;">✕</button>
             <div>
-                <div id="play-title" style="font-bold; color: #4ade80;"></div>
-                <div id="play-meta" style="font-size: 12px; color: #94a3b8;"></div>
+                <div id="play-title" style="font-weight: bold; color: #4ade80; font-size: 18px;"></div>
+                <div id="play-meta" style="font-size: 11px; color: #94a3b8;"></div>
             </div>
         </div>
         <div style="display: flex; align-items: center;">
-            <button class="btn-base btn-outline" style="padding: 5px 15px;" onclick="transposeDown()">-</button>
-            <span id="transpose-val" style="margin: 0 10px; font-weight: bold;">0</span>
-            <button class="btn-base btn-outline" style="padding: 5px 15px;" onclick="transposeUp()">+</button>
+            <button class="btn-ui btn-ghost" style="padding: 5px 15px;" onclick="transposeDown()">-</button>
+            <span id="transpose-val" style="margin: 0 12px; font-weight: bold; color: #4ade80;">0</span>
+            <button class="btn-ui btn-ghost" style="padding: 5px 15px;" onclick="transposeUp()">+</button>
         </div>
     </div>
 
-    <div id="play-lyrics" style="flex: 1; overflow-y: auto; padding: 20px;" class="no-scrollbar"></div>
+    <div id="play-lyrics" style="flex: 1; overflow-y: auto; padding: 25px;" class="no-scrollbar"></div>
 
-    <div class="player-footer">
-        <button class="btn-base btn-outline" onclick="playPrev()">Anterior</button>
+    <div class="player-bar">
+        <button class="btn-ui btn-ghost" onclick="playPrev()">Anterior</button>
         <div style="display: flex; align-items: center;">
-            <button id="btn-scroll" class="btn-base btn-green" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="toggleScroll()">▶</button>
+            <button id="btn-scroll" class="btn-ui btn-green" style="border-radius: 50%; width: 45px; height: 45px; padding: 0;" onclick="toggleScroll()">▶</button>
+            <input type="range" min="1" max="10" value="3" id="scroll-speed" style="width: 60px; margin-left: 10px;">
         </div>
-        <button class="btn-base btn-outline" onclick="playNext()">Próxima</button>
+        <button class="btn-ui btn-ghost" onclick="playNext()">Próxima</button>
     </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL PARA ADICIONAR AO SHOW -->
 <div id="modal-add" class="modal-overlay">
-    <div style="background: #0f172a; padding: 20px; border-radius: 15px; width: 80%;">
-        <h3 style="margin-bottom: 15px; font-bold;">Adicionar ao Show:</h3>
-        <div id="modal-shows-list"></div>
-        <button class="btn-base btn-outline" style="width: 100%; margin-top: 15px;" onclick="closeModal()">Fechar</button>
+    <div class="modal-content">
+        <h3 style="margin-bottom: 15px; font-weight: bold; text-align: center; color: #22c55e;">Adicionar ao Show</h3>
+        <div id="modal-shows-list" style="max-height: 250px; overflow-y: auto;"></div>
+        <button class="btn-ui btn-ghost" style="width: 100%; margin-top: 15px;" onclick="closeModal()">Fechar</button>
     </div>
 </div>
 
@@ -226,19 +177,18 @@ const notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', '
 
 // --- NAVEGAÇÃO ---
 function setTab(t) {
-    // Esconder todos
-    const tabs = document.querySelectorAll('.tab-content');
-    for(let i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
+    var tabs = document.getElementsByClassName('tab-content');
+    for(var i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
     
-    const navs = document.querySelectorAll('.nav-item');
-    for(let i=0; i<navs.length; i++) navs[i].classList.remove('active');
+    var navs = document.getElementsByClassName('nav-item');
+    for(var i=0; i<navs.length; i++) navs[i].classList.remove('active');
 
-    // Mostrar selecionado
     document.getElementById('tab-' + t).classList.add('active');
     document.getElementById('btn-tab-' + t).classList.add('active');
 
     if (t === 'musicas') renderBiblioteca();
     if (t === 'shows') renderShows();
+    if (t === 'editor') updateEditorPreview();
 }
 
 // --- RENDERIZADOR DE CIFRA ---
@@ -246,34 +196,38 @@ function renderSongContent(container, cifraText, columns, fontSize, tp) {
     container.style.columnCount = columns;
     container.style.fontSize = fontSize + 'px';
     
-    const sections = cifraText.split('\n---\n');
-    let finalHtml = '';
-    sections.forEach(function(section, sIdx) {
-        const paragraphs = section.split('\n\n');
-        const style = sIdx > 0 ? 'style="-webkit-column-break-before: always; break-before: column;"' : '';
-        finalHtml += '<div ' + style + '>';
-        paragraphs.forEach(function(para) {
-            if(!para.trim()) return;
+    var sections = cifraText.split('\n---\n');
+    var finalHtml = '';
+    
+    for(var i=0; i<sections.length; i++) {
+        var paragraphs = sections[i].split('\n\n');
+        var colStyle = i > 0 ? 'style="-webkit-column-break-before: always; break-before: column;"' : '';
+        finalHtml += '<div ' + colStyle + '>';
+        for(var j=0; j<paragraphs.length; j++) {
+            if(!paragraphs[j].trim()) continue;
             finalHtml += '<div class="verse-block">';
-            para.split('\n').forEach(function(line) { finalHtml += formatLine(line, tp); });
+            var lines = paragraphs[j].split('\n');
+            for(var k=0; k<lines.length; k++) {
+                finalHtml += formatLine(lines[k], tp);
+            }
             finalHtml += '</div>';
-        });
+        }
         finalHtml += '</div>';
-    });
+    }
     container.innerHTML = finalHtml;
 }
 
 function formatLine(t, tp) {
-    if (t.trim().indexOf('!') === 0) return '<div style="color:#f87171; font-style:italic; border-left:3px solid #f87171; padding-left:10px; margin:10px 0;">' + esc(t.substring(1)) + '</div>';
-    if (!t.trim()) return '<div style="height:8px"></div>';
+    if (t.trim().indexOf('!') === 0) return '<div class="note-box">' + esc(t.substring(1)) + '</div>';
+    if (!t.trim()) return '<div style="height:6px"></div>';
     
-    const tokens = t.trim().split(/\s+/);
-    const isChordLine = tokens.every(function(tk) {
+    var tokens = t.trim().split(/\s+/);
+    var isChordLine = tokens.every(function(tk) {
         return /^[A-G](#|b)?(maj|min|m|dim|aug|sus|add|7|9|13|4|6|M)*(\/[A-G](#|b)?)?$/.test(tk);
     });
 
     if (isChordLine) {
-        const rendered = tp === 0 ? t : t.replace(/[A-G](?:#|b)?(?:[a-zA-Z0-9]*)?(?:\/[A-G](?:#|b)?)?/g, function(m) {
+        var rendered = tp === 0 ? t : t.replace(/[A-G](?:#|b)?(?:[a-zA-Z0-9]*)?(?:\/[A-G](?:#|b)?)?/g, function(m) {
             return transposeChord(m, tp);
         });
         return '<div class="chord">' + rendered + '</div>';
@@ -282,34 +236,35 @@ function formatLine(t, tp) {
 }
 
 function transposeChord(chord, steps) {
-    const match = chord.match(/^([A-G])(#|b)?(.*)$/);
+    var match = chord.match(/^([A-G])(#|b)?(.*)$/);
     if (!match) return chord;
-    let root = match[1] + (match[2] || '');
-    let rest = match[3] || '';
-    let idx = notesSharp.indexOf(root);
+    var root = match[1] + (match[2] || '');
+    var rest = match[3] || '';
+    var idx = notesSharp.indexOf(root);
     if (idx === -1) idx = notesFlat.indexOf(root);
     if (idx === -1) return chord;
-    let newIdx = (idx + steps + 12) % 12;
+    var newIdx = (idx + steps + 12) % 12;
     return notesSharp[newIdx] + rest;
 }
 
 // --- BIBLIOTECA ---
 function renderBiblioteca() {
-    const div = document.getElementById('biblioteca-list');
-    let filtradas = library.filter(function(m) {
+    var div = document.getElementById('biblioteca-list');
+    var filtradas = library.filter(function(m) {
         return (m.title.toLowerCase().indexOf(searchTerm) > -1 || m.artist.toLowerCase().indexOf(searchTerm) > -1) &&
                (!currentArtistFilter || m.artist === currentArtistFilter);
     });
     
     div.innerHTML = filtradas.map(function(m) {
-        return '<div class="song-card">' +
+        return '<div class="card-song">' +
             '<div onclick="viewSingleSong(' + m.id + ')" style="flex:1">' +
-                '<div style="font-weight:bold; font-size:18px;">' + esc(m.title) + '</div>' +
-                '<div style="font-size:12px; color:#64748b; text-transform:uppercase;">' + esc(m.artist) + '</div>' +
+                '<div style="font-weight:bold; font-size:17px; color:#fff;">' + esc(m.title) + '</div>' +
+                '<div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:bold;">' + esc(m.artist) + '</div>' +
             '</div>' +
             '<div style="display:flex;">' +
-                '<button onclick="openAddToShow(' + m.id + ')" style="background:none; border:none; color:#22c55e; padding:10px; font-size:20px;">➕</button>' +
-                '<button onclick="deleteMusic(' + m.id + ')" style="background:none; border:none; color:#ef4444; padding:10px; font-size:20px;">🗑</button>' +
+                '<button onclick="openAddToShow(' + m.id + ')" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button>' +
+                '<button onclick="editMusic(' + m.id + ')" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button>' +
+                '<button onclick="deleteMusic(' + m.id + ')" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button>' +
             '</div>' +
         '</div>';
     }).join('');
@@ -317,20 +272,22 @@ function renderBiblioteca() {
 }
 
 function renderArtistTabs() {
-    const tabs = document.getElementById('artist-tabs');
-    const artistas = [];
-    library.forEach(function(x) { if(artistas.indexOf(x.artist) === -1) artistas.push(x.artist); });
+    var tabs = document.getElementById('artist-tabs');
+    var artistas = [];
+    for(var i=0; i<library.length; i++) {
+        if(artistas.indexOf(library[i].artist) === -1) artistas.push(library[i].artist);
+    }
     artistas.sort();
-    let html = '<button onclick="filterArtist(null)" style="padding:5px 10px; margin-right:5px; border-radius:5px; border:none; background:' + (!currentArtistFilter ? '#22c55e' : '#1e293b') + '">Todos</button>';
+    var html = '<button onclick="filterArtist(null)" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; background:' + (!currentArtistFilter ? '#22c55e' : '#1e293b') + '; color:' + (!currentArtistFilter ? '#000' : '#fff') + '; font-weight:bold;">Todos</button>';
     artistas.forEach(function(a) {
-        html += '<button onclick="filterArtist(\''+esc(a)+'\')" style="padding:5px 10px; margin-right:5px; border-radius:5px; border:none; white-space:nowrap; background:' + (currentArtistFilter === a ? '#22c55e' : '#1e293b') + '">' + esc(a) + '</button>';
+        html += '<button onclick="filterArtist(\''+esc(a)+'\')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:' + (currentArtistFilter === a ? '#22c55e' : '#1e293b') + '; color:' + (currentArtistFilter === a ? '#000' : '#fff') + '; font-weight:bold;">' + esc(a) + '</button>';
     });
     tabs.innerHTML = html;
 }
 
 // --- FUNÇÕES DE PLAYER ---
 function viewSingleSong(id) {
-    const m = library.find(function(x) { return x.id == id; });
+    var m = library.find(function(x) { return x.id == id; });
     currentShowSongs = [m]; playIndex = 0; transpose = 0;
     openPlayer();
 }
@@ -341,9 +298,9 @@ function openPlayer() {
 }
 
 function renderPlay() {
-    const s = currentShowSongs[playIndex];
+    var s = currentShowSongs[playIndex];
     document.getElementById('play-title').textContent = s.title;
-    document.getElementById('play-meta').textContent = s.artist + " • Tom: " + (s.key || 'N/A');
+    document.getElementById('play-meta').textContent = s.artist + " • Tom: " + (s.key || 'N/A') + (s.preset ? ' • ' + s.preset : '');
     document.getElementById('transpose-val').textContent = transpose;
     renderSongContent(document.getElementById('play-lyrics'), s.cifra, s.columns || 1, s.fontSize || 18, transpose);
 }
@@ -353,9 +310,9 @@ function backToMenu() {
     document.getElementById('show-play-screen').classList.remove('active');
 }
 
-// --- LOGICA GERAL ---
+// --- EDITOR ---
 function saveToLibrary() {
-    const song = {
+    var song = {
         id: Date.now(),
         title: document.getElementById('ed-title').value,
         artist: document.getElementById('ed-artist').value,
@@ -365,15 +322,40 @@ function saveToLibrary() {
         fontSize: edFontSize,
         columns: edColumns
     };
-    if(!song.title || !song.cifra) return alert("Título e Cifra obrigatórios");
-    library.push(song);
+    if(!song.title || !song.cifra) return alert("Preencha Título e Cifra");
+    
+    var idx = -1;
+    for(var i=0; i<library.length; i++) {
+        if(library[i].title == song.title && library[i].artist == song.artist) idx = i;
+    }
+    
+    if(idx >= 0) library[idx] = song; else library.push(song);
+    
     localStorage.setItem('biblio', JSON.stringify(library));
     alert("Salvo!");
     setTab('musicas');
 }
 
+function editMusic(id) {
+    var m = library.find(function(x) { return x.id == id; });
+    document.getElementById('ed-title').value = m.title;
+    document.getElementById('ed-artist').value = m.artist;
+    document.getElementById('ed-key').value = m.key;
+    document.getElementById('ed-preset').value = m.preset || '';
+    document.getElementById('ed-cifra').value = m.cifra;
+    edFontSize = m.fontSize || 16;
+    edColumns = m.columns || 1;
+    setTab('editor');
+}
+
+function changeEdFont(v) { edFontSize += v; updateEditorPreview(); }
+function setEdCols(v) { edColumns = v; updateEditorPreview(); }
+function updateEditorPreview() { renderSongContent(document.getElementById('editor-preview'), document.getElementById('ed-cifra').value, edColumns, 13, 0); }
+function clearEditor() { document.getElementById('ed-title').value=''; document.getElementById('ed-artist').value=''; document.getElementById('ed-cifra').value=''; updateEditorPreview(); }
+
+// --- SHOWS ---
 function createShow() {
-    const n = prompt("Nome do Show:");
+    var n = prompt("Nome do Show:");
     if(!n) return;
     shows.push({ id: Date.now(), name: n, songs: [] });
     localStorage.setItem('shows', JSON.stringify(shows));
@@ -381,78 +363,84 @@ function createShow() {
 }
 
 function renderShows() {
-    const div = document.getElementById('shows-list');
+    var div = document.getElementById('shows-list');
     div.innerHTML = shows.map(function(s) {
-        return '<div class="song-card">' +
-            '<div><div style="font-weight:bold; color:#22c55e;">'+esc(s.name)+'</div><div style="font-size:12px;">'+s.songs.length+' músicas</div></div>' +
-            '<button class="btn-base btn-blue" onclick="playShow('+s.id+')">▶ TOCAR</button>' +
+        return '<div class="card-song">' +
+            '<div><div style="font-weight:bold; color:#22c55e; font-size:18px;">'+esc(s.name)+'</div><div style="font-size:11px; font-weight:bold;">'+s.songs.length+' MÚSICAS</div></div>' +
+            '<div style="display:flex;">' +
+                '<button class="btn-ui btn-blue" style="padding:6px 12px; margin-right:8px;" onclick="playShow('+s.id+')">TOCAR</button>' +
+                '<button onclick="deleteShow('+s.id+')" style="background:none; border:none; color:#ef4444; padding:5px; font-size:18px;">🗑</button>' +
+            '</div>' +
         '</div>';
     }).join('');
 }
 
 function playShow(id) {
-    const s = shows.find(function(x) { return x.id == id; });
+    var s = shows.find(function(x) { return x.id == id; });
     if(s.songs.length === 0) return alert("Show sem músicas");
     currentShowSongs = s.songs; playIndex = 0; transpose = 0;
     openPlayer();
 }
 
 function openAddToShow(songId) {
-    const list = document.getElementById('modal-shows-list');
-    list.innerHTML = shows.map(function(sh) {
-        return '<button class="btn-base btn-outline" style="width:100%; margin-bottom:10px;" onclick="addToShow('+sh.id+','+songId+')">'+esc(sh.name)+'</button>';
-    }).join('');
+    var list = document.getElementById('modal-shows-list');
+    if(shows.length === 0) { list.innerHTML = '<p style="text-align:center; padding:10px;">Crie um show primeiro!</p>'; }
+    else {
+        list.innerHTML = shows.map(function(sh) {
+            return '<button class="btn-ui btn-ghost" style="width:100%; margin-bottom:8px; text-align:left;" onclick="addToShow('+sh.id+','+songId+')">➕ '+esc(sh.name)+'</button>';
+        }).join('');
+    }
     document.getElementById('modal-add').style.display = 'flex';
 }
 
 function addToShow(showId, songId) {
-    const sh = shows.find(function(x) { return x.id == showId; });
-    const sg = library.find(function(x) { return x.id == songId; });
+    var sh = shows.find(function(x) { return x.id == showId; });
+    var sg = library.find(function(x) { return x.id == songId; });
     sh.songs.push(JSON.parse(JSON.stringify(sg)));
     localStorage.setItem('shows', JSON.stringify(shows));
     closeModal();
-    alert("Adicionado!");
+    alert("Música adicionada!");
 }
 
+// --- UTILITÁRIOS ---
 function toggleScroll() {
-    const btn = document.getElementById('btn-scroll');
-    const container = document.getElementById('play-lyrics');
+    var btn = document.getElementById('btn-scroll');
+    var container = document.getElementById('play-lyrics');
     if (scrollInterval) {
         clearInterval(scrollInterval);
         scrollInterval = null;
         btn.textContent = '▶';
     } else {
         btn.textContent = '⏸';
-        scrollInterval = setInterval(function() { container.scrollTop += 1; }, 50);
+        var speed = document.getElementById('scroll-speed').value;
+        scrollInterval = setInterval(function() { container.scrollTop += 1; }, 110 - (speed * 10));
     }
 }
 
 function exportarMasterApp() {
-    let html = document.documentElement.outerHTML;
-    const dataInjection = 'let library = ' + JSON.stringify(library) + '; let shows = ' + JSON.stringify(shows) + ';';
-    const regex = /let library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\]; let shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
+    var html = document.documentElement.outerHTML;
+    var dataInjection = 'let library = ' + JSON.stringify(library) + '; let shows = ' + JSON.stringify(shows) + ';';
+    var regex = /let library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\]; let shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
     html = html.replace(regex, dataInjection);
-    const blob = new Blob([html], { type: 'text/html' });
-    const a = document.createElement('a');
+    var blob = new Blob([html], { type: 'text/html' });
+    var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'TATU_IPAD_OFFLINE.html';
+    a.download = 'TATU_IPAD_PRO.html';
     a.click();
 }
 
-// Auxiliares
 function closeModal() { document.getElementById('modal-add').style.display = 'none'; }
 function searchSongs() { searchTerm = document.getElementById('search-input').value.toLowerCase(); renderBiblioteca(); }
 function filterArtist(a) { currentArtistFilter = a; renderBiblioteca(); }
-function setEdCols(v) { edColumns = v; updateEditorPreview(); }
-function updateEditorPreview() { renderSongContent(document.getElementById('editor-preview'), document.getElementById('ed-cifra').value, edColumns, 14, 0); }
 function transposeUp() { transpose++; renderPlay(); }
 function transposeDown() { transpose--; renderPlay(); }
 function playPrev() { if(playIndex > 0) { playIndex--; renderPlay(); } }
 function playNext() { if(playIndex < currentShowSongs.length - 1) { playIndex++; renderPlay(); } }
-function deleteMusic(id) { if(confirm("Excluir?")) { library = library.filter(function(x){return x.id!=id}); localStorage.setItem('biblio', JSON.stringify(library)); renderBiblioteca(); } }
+function deleteMusic(id) { if(confirm("Excluir música?")) { library = library.filter(function(x){return x.id!=id}); localStorage.setItem('biblio', JSON.stringify(library)); renderBiblioteca(); } }
+function deleteShow(id) { if(confirm("Excluir show?")) { shows = shows.filter(function(x){return x.id!=id}); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
 function esc(t) { return t ? t.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
 
-// Iniciar
+// Inicialização
 renderBiblioteca();
 </script>
 </body>
