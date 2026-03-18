@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Tatu Chords Pro</title>
+    
+    <!-- CSS Moderno e Leve -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Roboto+Mono:wght@500;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f1f5f9; overflow-x: hidden; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        
+        /* Estilo da Cifra (Foco em Leitura no Palco) */
+        .chord { color: #4ade80; font-weight: 700; height: 1.25rem; white-space: pre; font-size: 1.1em; }
+        .lyric-line { color: #e2e8f0; font-weight: 600; line-height: 1.3; margin-bottom: 3px; }
+        .note { color: #f87171; font-style: italic; border-left: 4px solid #f87171; padding-left: 10px; margin: 12px 0; background: rgba(248, 113, 113, 0.1); padding-top: 4px; padding-bottom: 4px; }
+        .verse-block { margin-bottom: 1.8rem; break-inside: avoid; }
+
+        /* Container de Colunas */
+        .lyrics-container { column-gap: 2rem; column-fill: auto; height: auto; }
+
+        /* UI do Player */
+        #show-play-screen.is-fullscreen .player-ui { display: none; }
+        #show-play-screen.is-fullscreen #play-lyrics { padding-top: 30px; }
+
+        /* Preview no Editor */
+        .preview-box { background: #000; border: 1px solid #334155; border-radius: 12px; padding: 20px; min-height: 250px; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="main-app" class="max-w-4xl mx-auto pb-10">
+    <header class="p-6 text-center">
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent tracking-tighter">
+            TATU CHORDS
+        </h1>
+    </header>
+
+    <!-- Navegação Superior -->
+    <div class="px-4 mb-6">
+        <div class="tabs tabs-boxed bg-slate-900 border border-slate-800 p-1 w-full flex">
+            <button class="tab flex-1 font-bold" id="tab-btn-musicas" onclick="setTab('musicas')">Músicas</button>
+            <button class="tab flex-1 font-bold" id="tab-btn-shows" onclick="setTab('shows')">Shows</button>
+            <button class="tab flex-1 font-bold" id="tab-btn-editor" onclick="setTab('editor')">Editor</button>
+        </div>
+    </div>
+
+    <!-- ABA: MÚSICAS -->
+    <section id="tab-musicas" class="tab-content px-4">
+        <input type="text" id="search-input" placeholder="Buscar música ou artista..." 
+               class="input input-bordered w-full bg-slate-900 mb-6" oninput="searchSongs()">
+        
+        <div id="artist-tabs" class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2"></div>
+        
+        <div id="biblioteca-list" class="space-y-3"></div>
+    </section>
+
+    <!-- ABA: SHOWS -->
+    <section id="tab-shows" class="tab-content hidden px-4">
+        <div class="flex gap-2 mb-6">
+            <button class="btn btn-primary flex-1" onclick="createShow()">➕ Novo Show</button>
+            <button class="btn btn-outline btn-success" onclick="exportarMasterApp()" title="Gerar arquivo para iPad">
+                GERAR APP IPAD
+            </button>
+        </div>
+        <div id="shows-list" class="grid gap-4"></div>
+    </section>
+
+    <!-- ABA: EDITOR -->
+    <section id="tab-editor" class="tab-content hidden px-4 pb-10">
+        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <input id="ed-title" placeholder="Título" class="input input-bordered bg-black">
+                <input id="ed-artist" placeholder="Artista" class="input input-bordered bg-black">
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <input id="ed-key" placeholder="Tom" class="input input-bordered bg-black text-green-400 font-bold">
+                <input id="ed-preset" placeholder="Preset POD" class="input input-bordered bg-black text-blue-400 text-xs">
+            </div>
+            
+            <textarea id="ed-cifra" oninput="updateEditorPreview()" placeholder="Cifra aqui... Use --- para nova coluna." 
+                      class="textarea textarea-bordered w-full h-48 font-mono bg-black mb-4 focus:border-green-500"></textarea>
+
+            <div class="flex justify-between items-center bg-black p-2 rounded-lg mb-4">
+                <div class="flex gap-2">
+                    <button class="btn btn-xs" onclick="changeEdFont(-1)">A-</button>
+                    <button class="btn btn-xs" onclick="changeEdFont(1)">A+</button>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn btn-xs" id="btn-col-1" onclick="setEdCols(1)">1 Col</button>
+                    <button class="btn btn-xs" id="btn-col-2" onclick="setEdCols(2)">2 Col</button>
+                </div>
+            </div>
+
+            <div id="editor-preview" class="preview-box no-scrollbar mb-6"></div>
+
+            <div class="flex gap-2">
+                <button class="btn btn-success flex-1" onclick="saveToLibrary()">💾 Salvar</button>
+                <button class="btn btn-ghost" onclick="clearEditor()">Limpar</button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- PLAYER DE PERFORMANCE -->
+<div id="show-play-screen" class="fixed inset-0 bg-black z-50 hidden flex flex-col">
+    <!-- Header UI -->
+    <div class="player-ui p-4 bg-slate-900 flex justify-between items-center border-b border-slate-800">
+        <div class="flex items-center gap-4">
+            <button class="btn btn-circle btn-ghost text-2xl" onclick="backToMenu()">✕</button>
+            <div>
+                <h2 id="play-title" class="font-bold text-lg text-green-400 leading-none">Música</h2>
+                <p id="play-meta" class="text-xs text-slate-400"></p>
+                <p id="play-preset" class="text-[10px] text-blue-400 font-bold uppercase"></p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button class="btn btn-sm btn-outline btn-square" onclick="transposeDown()">-</button>
+            <div class="w-8 text-center font-bold text-green-400" id="transpose-val">0</div>
+            <button class="btn btn-sm btn-outline btn-square" onclick="transposeUp()">+</button>
+        </div>
+    </div>
+
+    <!-- Cifra (Toque para Fullscreen) -->
+    <div id="play-lyrics" class="flex-1 overflow-auto p-6 no-scrollbar cursor-pointer" onclick="toggleFullscreen()"></div>
+
+    <!-- Footer UI -->
+    <div class="player-ui p-4 bg-slate-900 flex justify-between items-center border-t border-slate-800">
+        <button class="btn btn-ghost" id="btn-prev" onclick="playPrev()">Anterior</button>
+        
+        <!-- Controle de Scroll -->
+        <div class="flex items-center gap-3">
+            <button id="btn-scroll" class="btn btn-circle btn-outline btn-sm btn-success" onclick="toggleScroll(event)">▶</button>
+            <input type="range" min="1" max="10" value="3" class="range range-xs range-success w-20" id="scroll-speed" onclick="event.stopPropagation()">
+        </div>
+
+        <button class="btn btn-ghost" id="btn-next" onclick="playNext()">Próxima</button>
+    </div>
+</div>
+
+<dialog id="modal-add" class="modal">
+    <div class="modal-box bg-slate-900 border border-slate-800">
+        <h3 class="font-bold text-lg mb-4">Adicionar ao Show</h3>
+        <div id="modal-shows-list" class="space-y-2"></div>
+        <div class="modal-action"><button class="btn" onclick="closeModal()">Fechar</button></div>
+    </div>
+</dialog>
+
+<script>
+// --- BANCO DE DADOS (Será preenchido na exportação) ---
+let library = JSON.parse(localStorage.getItem('biblio')) || [];
+let shows = JSON.parse(localStorage.getItem('shows')) || [];
+
+// --- VARIÁVEIS DE CONTROLE ---
+let currentShowSongs = null;
+let playIndex = 0;
+let transpose = 0;
+let searchTerm = '';
+let currentArtistFilter = null;
+let edFontSize = 14;
+let edColumns = 1;
+let scrollInterval = null;
+
+const notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+function setTab(t) {
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.add('hidden'));
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('tab-active', 'bg-green-500', 'text-black'));
+    document.getElementById('tab-' + t).classList.remove('hidden');
+    document.getElementById('tab-btn-' + t).classList.add('tab-active', 'bg-green-500', 'text-black');
+    if (t === 'musicas') renderBiblioteca();
+    if (t === 'shows') renderShows();
+    if (t === 'editor') updateEditorPreview();
+}
+
+// --- RENDERIZAÇÃO ---
+function renderSongContent(container, cifraText, columns, fontSize, tp) {
+    container.style.columnCount = columns;
+    container.style.fontSize = fontSize + 'px';
+    container.className = "lyrics-container no-scrollbar font-mono";
+    
+    const sections = cifraText.split('\n---\n');
+    let finalHtml = '';
+
+    sections.forEach((section, sIdx) => {
+        const paragraphs = section.split('\n\n');
+        const sectionStyle = sIdx > 0 ? 'style="break-before: column;"' : '';
+        finalHtml += `<div ${sectionStyle}>`;
+        paragraphs.forEach(para => {
+            if(!para.trim()) return;
+            finalHtml += `<div class="verse-block">`;
+            para.split('\n').forEach(line => { finalHtml += formatLine(line, tp); });
+            finalHtml += `</div>`;
+        });
+        finalHtml += `</div>`;
+    });
+    container.innerHTML = finalHtml;
+}
+
+function formatLine(t, tp) {
+    if (t.trim().startsWith('!')) return `<div class="note font-sans">${esc(t.substring(1))}</div>`;
+    if (!t.trim()) return '<div class="h-2"></div>';
+    
+    const tokens = t.trim().split(/\s+/);
+    const isChordLine = tokens.every(tk => /^[A-G](#|b)?(maj|min|m|dim|aug|sus|add|7|9|13|4|6|M)*(\/[A-G](#|b)?)?$/.test(tk));
+
+    if (isChordLine) {
+        const rendered = tp === 0 ? t : t.replace(/[A-G](?:#|b)?(?:maj|min|m|dim|aug|sus|add|7|9|13|4|6|M)*(?:\/[A-G](?:#|b)?)?/g, m => transposeChord(m, tp));
+        return `<div class="chord">${rendered}</div>`;
+    }
+    return `<div class="lyric-line font-sans">${esc(t)}</div>`;
+}
+
+function transposeChord(chord, steps) {
+    const match = chord.match(/^([A-G])(#|b)?(.*)$/);
+    if (!match) return chord;
+    let [ , root, acc, rest] = match;
+    let note = root + (acc || '');
+    let idx = notesSharp.indexOf(note);
+    if (idx === -1) idx = notesFlat.indexOf(note);
+    if (idx === -1) return chord;
+    let newIdx = (idx + steps + 12) % 12;
+    return notesSharp[newIdx] + rest;
+}
+
+// --- AUTO SCROLL ---
+function toggleScroll(e) {
+    if(e) e.stopPropagation();
+    const btn = document.getElementById('btn-scroll');
+    const container = document.getElementById('play-lyrics');
+
+    if (scrollInterval) {
+        clearInterval(scrollInterval);
+        scrollInterval = null;
+        btn.textContent = '▶';
+        btn.classList.remove('btn-active');
+    } else {
+        btn.textContent = '⏸';
+        btn.classList.add('btn-active');
+        const speed = document.getElementById('scroll-speed').value;
+        scrollInterval = setInterval(() => {
+            container.scrollTop += 1;
+        }, 110 - (speed * 10));
+    }
+}
+
+// --- EXPORTAÇÃO MESTRA (SOLUÇÃO IPAD) ---
+function exportarMasterApp() {
+    // Pegar o HTML atual
+    let html = document.documentElement.outerHTML;
+    
+    // Injetar os dados reais no lugar da leitura do LocalStorage
+    const dataInjection = `
+        let library = ${JSON.stringify(library)};
+        let shows = ${JSON.stringify(shows)};
+    `;
+    
+    // Substituir a lógica de carregamento inicial
+    const regex = /let library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\];\s+let shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
+    html = html.replace(regex, dataInjection);
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'TATU_PRO_IPAD.html';
+    a.click();
+}
+
+// --- FUNÇÕES DE NAVEGAÇÃO E UI ---
+function updateEditorPreview() {
+    renderSongContent(document.getElementById('editor-preview'), document.getElementById('ed-cifra').value, edColumns, edFontSize, 0);
+}
+
+function changeEdFont(v) { edFontSize += v; updateEditorPreview(); }
+function setEdCols(v) { edColumns = v; updateEditorPreview(); }
+
+function viewSingleSong(id) {
+    const m = library.find(x => x.id === id);
+    currentShowSongs = [m]; playIndex = 0; transpose = 0; openPlayer();
+}
+
+function openPlayer() {
+    document.getElementById('show-play-screen').classList.remove('hidden');
+    renderPlay();
+}
+
+function renderPlay() {
+    const s = currentShowSongs[playIndex];
+    document.getElementById('play-title').textContent = s.title;
+    document.getElementById('play-meta').textContent = `${s.artist} • Tom: ${s.key ? transposeChord(s.key, transpose) : 'N/A'}`;
+    document.getElementById('play-preset').textContent = s.preset || '';
+    document.getElementById('transpose-val').textContent = transpose;
+    
+    renderSongContent(document.getElementById('play-lyrics'), s.cifra, s.columns || 1, s.fontSize || 14, transpose);
+    
+    document.getElementById('btn-prev').style.visibility = playIndex > 0 ? 'visible' : 'hidden';
+    document.getElementById('btn-next').style.visibility = playIndex < currentShowSongs.length - 1 ? 'visible' : 'hidden';
+}
+
+function backToMenu() { 
+    if(scrollInterval) toggleScroll(); 
+    document.getElementById('show-play-screen').classList.add('hidden'); 
+}
+
+function transposeUp() { transpose++; renderPlay(); }
+function transposeDown() { transpose--; renderPlay(); }
+function playPrev() { if(playIndex > 0) { playIndex--; renderPlay(); } }
+function playNext() { if(playIndex < currentShowSongs.length - 1) { playIndex++; renderPlay(); } }
+function toggleFullscreen() { document.getElementById('show-play-screen').classList.toggle('is-fullscreen'); }
+
+// --- BIBLIOTECA ---
+function renderBiblioteca() {
+    const div = document.getElementById('biblioteca-list');
+    let filtradas = library.filter(m => 
+        (m.title.toLowerCase().includes(searchTerm) || m.artist.toLowerCase().includes(searchTerm)) &&
+        (!currentArtistFilter || m.artist === currentArtistFilter)
+    );
+    div.innerHTML = filtradas.map(m => `
+        <div class="bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 shadow-lg">
+            <div onclick="viewSingleSong(${m.id})" class="cursor-pointer flex-1">
+                <h3 class="font-bold text-white text-lg">${esc(m.title)}</h3>
+                <p class="text-xs text-slate-500 uppercase tracking-widest font-bold">${esc(m.artist)}</p>
+            </div>
+            <div class="flex gap-2">
+                <button class="btn btn-square btn-sm btn-ghost text-green-400" onclick="openAddToShow(${m.id})">➕</button>
+                <button class="btn btn-square btn-sm btn-ghost" onclick="editMusic(${m.id})">✏️</button>
+                <button class="btn btn-square btn-sm btn-ghost text-red-500" onclick="deleteMusic(${m.id})">🗑</button>
+            </div>
+        </div>
+    `).join('');
+    renderArtistTabs();
+}
+
+function renderArtistTabs() {
+    const tabs = document.getElementById('artist-tabs');
+    const artistas = [...new Set(library.map(x => x.artist))].sort();
+    let html = `<button class="btn btn-xs ${!currentArtistFilter ? 'btn-success text-black' : 'btn-outline'}" onclick="filterArtist(null)">Todos</button>`;
+    artistas.forEach(a => {
+        html += `<button class="btn btn-xs ${currentArtistFilter === a ? 'btn-success text-black' : 'btn-outline'}" onclick="filterArtist('${esc(a)}')">${esc(a)}</button>`;
+    });
+    tabs.innerHTML = html;
+}
+
+function filterArtist(art) { currentArtistFilter = art; renderBiblioteca(); }
+function searchSongs() { searchTerm = document.getElementById('search-input').value.toLowerCase(); renderBiblioteca(); }
+
+function saveToLibrary() {
+    const song = {
+        id: Date.now(),
+        title: document.getElementById('ed-title').value,
+        artist: document.getElementById('ed-artist').value,
+        key: document.getElementById('ed-key').value,
+        preset: document.getElementById('ed-preset').value,
+        cifra: document.getElementById('ed-cifra').value,
+        fontSize: edFontSize,
+        columns: edColumns
+    };
+    if(!song.title || !song.cifra) return alert("Preencha Título e Cifra");
+    
+    const idx = library.findIndex(x => x.title === song.title && x.artist === song.artist);
+    if(idx >= 0) library[idx] = song; else library.push(song);
+    
+    localStorage.setItem('biblio', JSON.stringify(library));
+    alert("Salvo!");
+    setTab('musicas');
+}
+
+function clearEditor() {
+    document.querySelectorAll('#tab-editor input, #tab-editor textarea').forEach(i => i.value = '');
+    updateEditorPreview();
+}
+
+function editMusic(id) {
+    const m = library.find(x => x.id === id);
+    document.getElementById('ed-title').value = m.title;
+    document.getElementById('ed-artist').value = m.artist;
+    document.getElementById('ed-key').value = m.key;
+    document.getElementById('ed-preset').value = m.preset;
+    document.getElementById('ed-cifra').value = m.cifra;
+    edFontSize = m.fontSize || 14;
+    edColumns = m.columns || 1;
+    setTab('editor');
+}
+
+function deleteMusic(id) {
+    if(confirm("Excluir?")) {
+        library = library.filter(x => x.id !== id);
+        localStorage.setItem('biblio', JSON.stringify(library));
+        renderBiblioteca();
+    }
+}
+
+function createShow() {
+    const n = prompt("Nome do Show:");
+    if(!n) return;
+    shows.push({ id: Date.now(), name: n, songs: [] });
+    localStorage.setItem('shows', JSON.stringify(shows));
+    renderShows();
+}
+
+function renderShows() {
+    const div = document.getElementById('shows-list');
+    div.innerHTML = shows.map(s => `
+        <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-green-400">${esc(s.name)}</h2>
+                    <p class="text-xs text-slate-500 font-bold">${s.songs.length} músicas</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn btn-sm btn-primary" onclick="playShow(${s.id})">▶ TOCAR</button>
+                    <button class="btn btn-sm btn-square btn-ghost text-red-500" onclick="deleteShow(${s.id})">🗑</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function deleteShow(id) {
+    if(confirm("Excluir show?")) {
+        shows = shows.filter(x => x.id !== id);
+        localStorage.setItem('shows', JSON.stringify(shows));
+        renderShows();
+    }
+}
+
+function openAddToShow(songId) {
+    const s = library.find(x => x.id === songId);
+    const list = document.getElementById('modal-shows-list');
+    list.innerHTML = shows.map(sh => `
+        <button class="btn btn-outline w-full justify-start" onclick="addToShow(${sh.id}, ${s.id})">${esc(sh.name)}</button>
+    `).join('');
+    document.getElementById('modal-add').showModal();
+}
+
+function addToShow(showId, songId) {
+    const sh = shows.find(x => x.id === showId);
+    const sg = library.find(x => x.id === songId);
+    sh.songs.push({...sg});
+    localStorage.setItem('shows', JSON.stringify(shows));
+    document.getElementById('modal-add').close();
+    alert("Adicionado!");
+}
+
+function closeModal() { document.getElementById('modal-add').close(); }
+function esc(t) { return t ? t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
+
+// Iniciar
+setTab('musicas');
+</script>
+</body>
+</html>
