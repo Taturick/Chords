@@ -1,167 +1,176 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+<html lang="pt-BR"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tatu Chords Pro</title>
+    <title>TATU MASTER PRO - IPAD SIMULATOR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #020617; color: #f1f5f9; margin: 0; }
         .tab-content { display: none !important; }
         .tab-content.active { display: block !important; }
+        
         .nav-bar { display: flex; background: #0f172a; margin: 10px; border-radius: 10px; border: 1px solid #1e293b; overflow: hidden; }
         .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: bold; cursor: pointer; color: #94a3b8; }
         .nav-item.active { background: #22c55e; color: #000; }
-        .btn-ui { padding: 10px 15px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; display: inline-block; text-align: center; font-size: 14px; }
+        
+        .btn-ui { padding: 8px 12px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; display: inline-block; text-align: center; font-size: 13px; transition: 0.2s; }
         .btn-green { background: #22c55e; color: #000; }
         .btn-blue { background: #3b82f6; color: #fff; }
         .btn-ghost { background: transparent; border: 1px solid #334155; color: #fff; }
+        .btn-active { background: #facc15 !important; color: #000 !important; border-color: #facc15 !important; }
+        
         .input-ui { background: #000; border: 1px solid #334155; color: #fff; padding: 12px; width: 100%; border-radius: 8px; margin-bottom: 8px; box-sizing: border-box; }
         .card-song { background: #0f172a; border: 1px solid #1e293b; padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* PREVIEW MODO IPAD AIR */
+        .ipad-frame {
+            width: 768px !important; /* Largura exata do iPad Air */
+            height: 960px !important; /* Altura útil aproximada */
+            margin: 0 auto;
+            border: 4px solid #334155 !important;
+            position: relative;
+            overflow-y: auto !important;
+            background: #000;
+        }
+        .ipad-label {
+            display: none;
+            text-align: center;
+            font-size: 10px;
+            color: #facc15;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .ipad-mode-on .ipad-label { display: block; }
+
+        /* Estilos da Cifra */
+        .chord { color: #4ade80; font-weight: bold; font-family: 'Courier New', monospace; font-size: inherit; line-height: inherit; white-space: pre; }
+        .lyric-line { color: #fff; margin-bottom: 2px; font-size: inherit; line-height: inherit; }
+        .verse-block { margin-bottom: 1.5rem; break-inside: avoid; -webkit-column-break-inside: avoid; }
+        .lyrics-container { column-gap: 2rem; column-fill: auto; }
+        .note-box { color: #f87171; font-style: italic; border-left: 4px solid #f87171; padding: 5px 10px; margin: 10px 0; background: rgba(248, 113, 113, 0.1); font-size: 0.9em; line-height: 1.2; }
+        
         #show-play-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 9999; display: none; flex-direction: column; }
         #show-play-screen.active { display: flex !important; }
         .player-bar { background: #0f172a; padding: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
-
-        /* FIX DE FONTE: O segredo está no inherit */
-        .chord { color: #4ade80; font-weight: bold; font-family: 'Courier New', monospace; font-size: inherit; }
-        .lyric-line { color: #fff; margin-bottom: 2px; line-height: 1.2; font-size: inherit; }
-        
-        .verse-block { margin-bottom: 1.5rem; break-inside: avoid; -webkit-column-break-inside: avoid; }
-        .lyrics-container { column-gap: 2rem; column-fill: auto; }
-        .note-box { color: #f87171; font-style: italic; border-left: 4px solid #f87171; padding: 5px 10px; margin: 10px 0; background: rgba(248, 113, 113, 0.1); font-size: 0.9em; }
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; }
-        .modal-content { background: #0f172a; padding: 20px; border-radius: 15px; width: 85%; border: 1px solid #334155; }
+        .modal-content { background: #0f172a; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; border: 1px solid #334155; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
-</head>
-<body>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.border-yellow-400{--tw-border-opacity:1;border-color:rgb(250 204 21 / var(--tw-border-opacity, 1))}.text-yellow-400{--tw-text-opacity:1;color:rgb(250 204 21 / var(--tw-text-opacity, 1))}</style></head>
+<body class="ipad-mode-off ipad-mode-on">
 
 <div id="main-ui-wrapper">
-    <header style="text-align: center; padding: 15px;"><h1 style="color: #4ade80; font-size: 22px; font-weight: bold;">TATU CHORDS PRO</h1></header>
+    <header style="text-align: center; padding: 15px;"><h1 style="color: #4ade80; font-size: 22px; font-weight: bold;">TATU MASTER PRO</h1></header>
+
     <div class="nav-bar">
-        <div class="nav-item active" id="btn-tab-musicas" onclick="setTab('musicas')">Músicas</div>
-        <div class="nav-item" id="btn-tab-shows" onclick="setTab('shows')">Shows</div>
+        <div class="nav-item" id="btn-tab-musicas" onclick="setTab('musicas')">Músicas</div>
+        <div class="nav-item active" id="btn-tab-shows" onclick="setTab('shows')">Shows</div>
         <div class="nav-item" id="btn-tab-editor" onclick="setTab('editor')">Editor</div>
     </div>
 
-    <!-- ABA: MÚSICAS -->
-    <section id="tab-musicas" class="tab-content active" style="padding: 10px;">
-        <input type="text" id="search-input" placeholder="Buscar música..." class="input-ui" oninput="searchSongs()">
-        <div id="artist-tabs" style="display: flex; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px;"></div>
-        <div id="biblioteca-list"></div>
+    <section id="tab-musicas" class="tab-content" style="padding: 10px;">
+        <input type="text" id="search-input" placeholder="Buscar música ou artista..." class="input-ui" oninput="searchSongs()">
+        <div id="artist-tabs" style="display: flex; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px;"><button onclick="filterArtist(null)" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; background:#22c55e; color:#000; font-weight:bold;">Todos</button><button onclick="filterArtist('Pearl Jam')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Pearl Jam</button><button onclick="filterArtist('Radiohead')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Radiohead</button><button onclick="filterArtist('Skank')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Skank</button></div>
+        <div id="biblioteca-list"><div class="card-song"><div onclick="viewSingleSong(1773859249107)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Creep</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Radiohead</div></div><div style="display:flex;"><button onclick="openAddToShow(1773859249107)" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button><button onclick="editMusic(1773859249107)" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button><button onclick="deleteMusic(1773859249107)" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1773859447035)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Jack Tequila</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Skank</div></div><div style="display:flex;"><button onclick="openAddToShow(1773859447035)" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button><button onclick="editMusic(1773859447035)" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button><button onclick="deleteMusic(1773859447035)" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1773859610483)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Alive</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Pearl Jam</div></div><div style="display:flex;"><button onclick="openAddToShow(1773859610483)" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button><button onclick="editMusic(1773859610483)" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button><button onclick="deleteMusic(1773859610483)" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div></div>
     </section>
 
-    <!-- ABA: SHOWS -->
-    <section id="tab-shows" class="tab-content" style="padding: 10px;">
+    <section id="tab-shows" class="tab-content active" style="padding: 10px;">
         <div style="display: flex; margin-bottom: 15px;">
             <button class="btn-ui btn-blue" style="flex: 2; margin-right: 8px;" onclick="createShow()">➕ Novo Show</button>
-            <button class="btn-ui btn-ghost" onclick="exportarMasterApp()">EXPORTAR</button>
+            <button class="btn-ui btn-ghost" onclick="exportarMasterApp()">EXPORTAR PARA IPAD</button>
         </div>
-        <div id="shows-list"></div>
+        <div id="shows-list"><div class="card-song"><div><div style="font-weight:bold; color:#22c55e; font-size:18px;">Pacto</div><div style="font-size:11px; font-weight:bold;">3 MÚSICAS</div></div><div style="display:flex;"><button class="btn-ui btn-blue" style="padding:6px 12px; margin-right:8px;" onclick="playShow(1773605541212)">TOCAR</button><button onclick="deleteShow(1773605541212)" style="background:none; border:none; color:#ef4444; padding:5px; font-size:18px;">🗑</button></div></div></div>
     </section>
 
-    <!-- ABA: EDITOR -->
     <section id="tab-editor" class="tab-content" style="padding: 10px;">
         <div style="background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid #1e293b;">
-            <div style="display: flex; margin-bottom: 8px;">
-                <input id="ed-title" placeholder="Título" class="input-ui" style="margin-right: 5px;">
-                <input id="ed-artist" placeholder="Artista" class="input-ui">
-            </div>
-            <div style="display: flex; margin-bottom: 8px;">
-                <input id="ed-key" placeholder="Tom" class="input-ui" style="margin-right: 5px; color: #4ade80;">
-                <input id="ed-preset" placeholder="Preset POD" class="input-ui">
-            </div>
+            <div style="display: flex; margin-bottom: 8px;"><input id="ed-title" placeholder="Título" class="input-ui" style="margin-right: 5px;"><input id="ed-artist" placeholder="Artista" class="input-ui"></div>
+            <div style="display: flex; margin-bottom: 8px;"><input id="ed-key" placeholder="Tom" class="input-ui" style="margin-right: 5px; color: #4ade80;"><input id="ed-preset" placeholder="Preset POD" class="input-ui"></div>
             <textarea id="ed-cifra" oninput="updateEditorPreview()" placeholder="Cifra aqui..." class="input-ui" style="height: 180px; font-family: monospace;"></textarea>
             
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #000; padding: 8px; border-radius: 8px;">
-                <div style="display: flex;">
-                    <button class="btn-ui btn-ghost" style="padding: 5px 12px; margin-right: 5px;" onclick="changeEdFont(-2)">A-</button>
-                    <button class="btn-ui btn-ghost" style="padding: 5px 12px;" onclick="changeEdFont(2)">A+</button>
-                    <span id="font-size-display" style="margin-left: 10px; line-height: 30px; font-size: 12px; color: #22c55e;">16px</span>
+            <div style="background: #000; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center;">
+                        <button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="changeEdFont(-2)">A-</button>
+                        <button class="btn-ui btn-ghost" onclick="changeEdFont(2)">A+</button>
+                    </div>
+                    <!-- NOVO BOTAO SIMULADOR IPAD -->
+                    <button id="btn-ipad-toggle" class="btn-ui btn-ghost text-yellow-400 border-yellow-400 btn-active" onclick="toggleIpadView()">📱 SIMULAR IPAD AIR</button>
+                    
+                    <div style="display: flex; align-items: center;">
+                        <button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="changeEdSpacing(-0.1)">S-</button>
+                        <button class="btn-ui btn-ghost" onclick="changeEdSpacing(0.1)">S+</button>
+                    </div>
                 </div>
-                <div style="display: flex;">
-                    <button class="btn-ui btn-ghost" style="padding: 5px 12px; margin-right: 5px;" onclick="setEdCols(1)">1 Col</button>
-                    <button class="btn-ui btn-ghost" style="padding: 5px 12px;" onclick="setEdCols(2)">2 Col</button>
+                <div style="display: flex; justify-content: center; border-top: 1px solid #1e293b; padding-top: 8px;">
+                    <button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="setEdCols(1)">1 Col</button>
+                    <button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="setEdCols(2)">2 Col</button>
+                    <button class="btn-ui btn-ghost" onclick="setEdCols(3)">3 Col</button>
                 </div>
             </div>
-            <div id="editor-preview" style="background: #000; padding: 15px; border-radius: 8px; min-height: 100px; margin-bottom: 15px; overflow: auto;"></div>
-            <div style="display: flex;">
-                <button class="btn-ui btn-green" style="flex: 1; margin-right: 8px;" onclick="saveToLibrary()">💾 Salvar</button>
-                <button class="btn-ui btn-ghost" onclick="clearEditor()">Limpar</button>
-            </div>
+
+            <div class="ipad-label">Visualização Real: iPad Air (768px)</div>
+            <div id="editor-preview" style="background: rgb(0, 0, 0); padding: 15px; border-radius: 8px; min-height: 150px; margin-bottom: 15px; overflow: auto; column-count: 2; font-size: 14px; line-height: 1.5;" class="ipad-frame"><div><div class="verse-block"><div class="note-box">[Intro] </div><div class="lyric-line">A5</div></div><div class="verse-block"><div class="lyric-line">Son, she said</div><div class="lyric-line">Have I got a little story for you</div><div class="lyric-line">What you thought was your daddy</div><div class="lyric-line">Was nothin' but a</div><div class="lyric-line">While you were sittin'</div><div class="lyric-line">Home alone at age thirteen</div><div class="lyric-line">Your real daddy was dyin'</div><div class="chord">                  F      C</div><div class="lyric-line">Sorry you didn't see him</div><div class="chord">          F         C</div><div class="lyric-line">But I'm glad we talked</div></div><div class="verse-block"><div class="lyric-line">[Refrão]</div></div><div class="verse-block"><div class="lyric-line">   E5 G5  D5        A5</div><div class="lyric-line">Oh I, oh, I'm still alive</div><div class="lyric-line">     E5 G5  D5        A5</div><div class="lyric-line">Hey, I, oh, I'm still alive</div><div class="lyric-line">    E5 G5  D5          A5</div><div class="lyric-line">Hey I, oh, I'm still alive</div><div class="lyric-line">      B5</div><div class="lyric-line">Hey...oh</div></div><div class="verse-block"><div style="height:6px"></div><div class="lyric-line">Oh, she walks slowly</div><div class="lyric-line">Across a young man's room</div><div class="lyric-line">She said I'm ready... for you</div><div class="lyric-line">I can't remember anything to this very day</div><div class="lyric-line">'Cept the look, the look</div><div class="chord">F                C</div><div class="lyric-line">Oh, you know where</div><div class="chord">    F        C</div><div class="lyric-line">Now I can't see, I just stare</div></div><div class="verse-block"><div style="height:6px"></div><div class="chord">E G D         A</div><div class="lyric-line"> I, I'm still alive    </div><div class="chord">E  G  D         A</div><div class="lyric-line">Hey I, but, I'm still alive</div><div class="chord">    E  G  D         A</div><div class="lyric-line">Hey I, boy, I'm still alive</div><div class="chord">    E G  D         A</div><div class="lyric-line">Hey I, oh, I'm still alive, yeah</div></div><div class="verse-block"><div class="note-box">[Ponte]</div><div class="lyric-line">B5  F#  B5  F#</div><div class="lyric-line">B5  F#  B5  F#</div></div><div class="verse-block"><div class="lyric-line">A  A2  D5                       A   A2</div><div class="lyric-line">          Is something wrong, she said</div><div class="lyric-line">             A   A2     D5</div><div class="lyric-line">Well of course there is</div><div class="lyric-line">                      A   A2</div><div class="lyric-line">You're still alive, she said</div><div class="lyric-line">                         B  B2  E5</div><div class="lyric-line">Oh, and do I deserve to be</div><div class="lyric-line">                  B  B2</div><div class="lyric-line">Is that the question</div><div class="lyric-line">        B  B2       E5</div><div class="lyric-line">And if so,    if so</div><div class="lyric-line">         B5  B2</div><div class="lyric-line">Who answers,    who answers</div></div><div class="verse-block"><div style="height:6px"></div><div class="lyric-line">E5 G5  D5          A2</div><div class="lyric-line">I, oh, I'm still alive</div><div class="lyric-line">    E5 G5  D5         A2</div><div class="lyric-line">Hey I, oh, I'm still alive</div><div class="lyric-line">    E5 G5  D5         A2</div><div class="lyric-line">Hey I, oh, I'm still alive</div><div class="lyric-line">    E5 G5               D5  A2</div><div class="lyric-line">Hey I, hmm, I'm still alive,  yeah, yeah</div></div><div class="verse-block"><div class="lyric-line">[Solo] E5  G5  D5  A5</div></div></div></div>
+            
+            <div style="display: flex;"><button class="btn-ui btn-green" style="flex: 1; margin-right: 8px;" onclick="saveToLibrary()">💾 Salvar</button><button class="btn-ui btn-ghost" onclick="clearEditor()">Limpar</button></div>
         </div>
     </section>
 </div>
 
 <!-- PLAYER -->
-<div id="show-play-screen">
+<div id="show-play-screen" class="">
     <div class="player-bar">
-        <div style="display: flex; align-items: center;">
-            <button onclick="backToMenu()" style="background: none; border: none; color: #fff; font-size: 26px; margin-right: 15px;">✕</button>
-            <div><div id="play-title" style="font-weight: bold; color: #4ade80;"></div><div id="play-meta" style="font-size: 11px; color: #94a3b8;"></div></div>
-        </div>
-        <div style="display: flex; align-items: center;">
-            <button class="btn-ui btn-ghost" onclick="transposeDown()">-</button>
-            <span id="transpose-val" style="margin: 0 12px; font-weight: bold; color: #4ade80;">0</span>
-            <button class="btn-ui btn-ghost" onclick="transposeUp()">+</button>
-        </div>
+        <div style="display: flex; align-items: center;"><button onclick="backToMenu()" style="background: none; border: none; color: #fff; font-size: 26px; margin-right: 15px;">✕</button><div><div id="play-title" style="font-weight: bold; color: #4ade80; font-size: 18px;">Creep</div><div id="play-meta" style="font-size: 11px; color: #94a3b8;">Radiohead • Tom: G • Creep</div></div></div>
+        <div style="display: flex; align-items: center;"><button class="btn-ui btn-ghost" onclick="transposeDown()">-</button><span id="transpose-val" style="margin: 0 12px; font-weight: bold; color: #4ade80;">0</span><button class="btn-ui btn-ghost" onclick="transposeUp()">+</button></div>
     </div>
-    <div id="play-lyrics" style="flex: 1; overflow-y: auto; padding: 25px;" class="no-scrollbar"></div>
-    <div class="player-bar">
-        <button class="btn-ui btn-ghost" onclick="playPrev()">Anterior</button>
-        <button id="btn-scroll" class="btn-ui btn-green" style="border-radius: 50%; width: 45px; height: 45px;" onclick="toggleScroll()">▶</button>
-        <button class="btn-ui btn-ghost" onclick="playNext()">Próxima</button>
-    </div>
+    <div id="play-lyrics" style="flex: 1 1 0%; overflow-y: auto; padding: 25px; column-count: 2; font-size: 16px; line-height: 1.1;" class="no-scrollbar"><div><div class="verse-block"><div class="lyric-line">[Intro] G  B  C  Cm</div></div><div class="verse-block"><div class="chord">                      G</div><div class="lyric-line">When you were here before</div><div class="chord">                         B</div><div class="lyric-line">Couldn't look you in the eye</div><div class="chord">                    C</div><div class="lyric-line">You're just like an angel</div><div class="chord">                     Cm</div><div class="lyric-line">Your skin makes me cry</div></div><div class="verse-block"><div class="lyric-line">[Segunda Parte]</div></div><div class="verse-block"><div class="chord">                  G</div><div class="lyric-line">You float like a feather</div><div class="chord">                B</div><div class="lyric-line">In a beautiful world</div><div class="chord">               C</div><div class="lyric-line">I wish I was special</div><div class="chord">                    Cm</div><div class="lyric-line">You're so fucking special</div></div><div class="verse-block"><div style="height:6px"></div><div class="chord">            G</div><div class="lyric-line">But I'm a creep</div><div class="chord">       B</div><div class="lyric-line">I'm a weirdo</div><div class="chord">                          C</div><div class="lyric-line">What the hell am I doing here?</div><div class="chord">           Cm</div><div class="lyric-line">I don't belong here</div></div><div class="verse-block"><div style="height:6px"></div><div class="chord">                    G</div><div class="lyric-line">I don't care if it hurts</div><div class="chord">                  B</div><div class="lyric-line">I wanna have control</div><div class="chord">                   C</div><div class="lyric-line">I wanna a perfect body</div><div class="chord">                   Cm</div><div class="lyric-line">I wanna a perfect soul</div></div><div class="verse-block"><div class="chord">               G</div><div class="lyric-line">I want you to notice</div><div class="chord">               B</div><div class="lyric-line">When I'm not around</div><div class="chord">                    C</div><div class="lyric-line">You're so fucking special</div><div class="chord">               Cm</div><div class="lyric-line">I wish I was special</div></div><div class="verse-block"><div style="height:6px"></div><div class="chord">            G</div><div class="lyric-line">But I'm a creep</div><div class="chord">       B</div><div class="lyric-line">I'm a weirdo</div><div class="chord">                          C</div><div class="lyric-line">What the hell am I doing here?</div><div class="chord">            Cm</div><div class="lyric-line">I don't belong here</div></div><div class="verse-block"><div style="height:6px"></div><div class="chord">  G                        B</div><div class="lyric-line">She's running out the door</div><div class="chord">  C</div><div class="lyric-line">She's running out</div><div class="chord">     Cm                G  B</div><div class="lyric-line">She run, run, run, run</div><div class="chord"> C  Cm</div><div class="lyric-line">Run</div></div><div class="verse-block"><div style="height:6px"></div><div class="chord">                    G</div><div class="lyric-line">Whatever makes you happy</div><div class="chord">              B</div><div class="lyric-line">Whatever you want</div><div class="chord">             C</div><div class="lyric-line">So fucking special</div><div class="chord">               Cm</div><div class="lyric-line">I wish I was special</div></div><div class="verse-block"><div style="height:6px"></div><div class="chord">            G</div><div class="lyric-line">But I'm a creep</div><div class="chord">       B</div><div class="lyric-line">I'm a weirdo</div><div class="chord">                          C</div><div class="lyric-line">What the hell am I doing here?</div><div class="chord">           Cm</div><div class="lyric-line">I don't belong here</div><div class="chord">           G</div><div class="lyric-line">I don't belong here</div></div></div></div>
+    <div class="player-bar"><button class="btn-ui btn-ghost" onclick="playPrev()">Anterior</button><button id="btn-scroll" class="btn-ui btn-green" style="border-radius: 50%; width: 45px; height: 45px; padding: 0;" onclick="toggleScroll()">▶</button><button class="btn-ui btn-ghost" onclick="playNext()">Próxima</button></div>
 </div>
 
-<div id="modal-add" class="modal-overlay"><div class="modal-content">
-    <h3 style="margin-bottom: 15px; font-weight: bold; color: #22c55e;">Adicionar ao Show</h3>
-    <div id="modal-shows-list"></div>
-    <button class="btn-ui btn-ghost" style="width: 100%; margin-top: 15px;" onclick="closeModal()">Fechar</button>
-</div></div>
+<div id="modal-add" class="modal-overlay"><div class="modal-content"><h3 style="margin-bottom: 15px; font-weight: bold; text-align: center; color: #22c55e;">Adicionar ao Show</h3><div id="modal-shows-list"></div><button class="btn-ui btn-ghost" style="width: 100%; margin-top: 15px;" onclick="closeModal()">Fechar</button></div></div>
 
 <script>
-let library = JSON.parse(localStorage.getItem('biblio')) || [];
-let shows = JSON.parse(localStorage.getItem('shows')) || [];
-let currentShowSongs = null;
-let playIndex = 0;
-let transpose = 0;
-let searchTerm = '';
-let currentArtistFilter = null;
-let edFontSize = 16; // Fonte inicial
-let edColumns = 1;
-let scrollInterval = null;
+var library = [{"id":1773859249107,"title":"Creep","artist":"Radiohead","key":"G","preset":"Creep","cifra":"[Intro] G  B  C  Cm\n\n                      G\nWhen you were here before\n                         B\nCouldn't look you in the eye\n                    C\nYou're just like an angel\n                     Cm\nYour skin makes me cry\n\n[Segunda Parte]\n\n                  G\nYou float like a feather\n                B\nIn a beautiful world\n               C\nI wish I was special\n                    Cm\nYou're so fucking special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n\n\n                    G\nI don't care if it hurts\n                  B\nI wanna have control\n                   C\nI wanna a perfect body\n                   Cm\nI wanna a perfect soul\n\n\n\n\n\n\n\n\n\n               G\nI want you to notice\n               B\nWhen I'm not around\n                    C\nYou're so fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n            Cm\nI don't belong here\n\n\n  G                        B\nShe's running out the door\n  C\nShe's running out\n     Cm                G  B\nShe run, run, run, run\n C  Cm\nRun\n\n\n                    G\nWhatever makes you happy\n              B\nWhatever you want\n             C\nSo fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n           G\nI don't belong here","fontSize":16,"columns":2,"lineHeight":1.1},{"id":1773859447035,"title":"Jack Tequila","artist":"Skank","key":"C","preset":"Clean","cifra":" C  F  C  F\n\nC     F\nFunk lá no morro da mangueira\n             C                  F\nEssa menina tá dizendo, sim eu sei\n C                     F\nNoite bamba, tudo à beça\n   C                     F\nBaião na rampa do cruzeiro\n             C                   F\nEssa menina tá dizendo don't worry\n                     C                 F\nCause everything is gonna be all right\n              C\nEverything, every tune\n                F\nWill be played by night\n    C        F\nOh yeh eh oh oh\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n C  F  C  F \n\n\n        C                F\nReggae lá na rádio do café\n            C                   F\nRapaziada que estiver afim vai lá\n        C            F\nEu vou ficar com Jackie oh\n   C                  F\nSe é que Jackie vai pra lá\n          C       F\nE se não for, já foi\n         C                 F\nO bonde do desejo segue rumo\n C                F\nCaixa, bumbo e sexo\n         C                   F\nSaudade na rampa do mundo oh oh\n\n![Refrão]\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n C\nJackie foi nascer\n        F\nNuma cabana em noa noa\n C               F\nSol do taiti na pele, now boa\n     C\nSeu pai cruzou o mar\n      F\nDuas filhas na canoa\n C                F\nCôco pra beber e leite de leoa\n C\nJackie é uma menina\n       F\nTão bonita que enjoa\n\n   C                 F\nEnjôo de vertigem, viagem de avião\n C                     F\nHálito de virgem, dois olhos de amêndoa   C             F\nVaca, cadela, macaca, gazela\n C           F\nLinda toda, toda linda ela\n C              F\nToda beleza se reconhece nela\n C              F\nJackie tequila coca-cola e água\nC              F\nÉgua, língua, mingua minha mágoa\n   C       F\nOh oh yeh\n\n\n","fontSize":17,"columns":2,"lineHeight":1},{"id":1773859610483,"title":"Alive","artist":"Pearl Jam","key":"E","preset":"Vox+DriveVoz","cifra":"![Intro] \nA5\n\nSon, she said\nHave I got a little story for you\nWhat you thought was your daddy\nWas nothin' but a\nWhile you were sittin'\nHome alone at age thirteen\nYour real daddy was dyin'\n                  F      C\nSorry you didn't see him\n          F         C\nBut I'm glad we talked\n\n[Refrão]\n\n   E5 G5  D5        A5\nOh I, oh, I'm still alive\n     E5 G5  D5        A5\nHey, I, oh, I'm still alive\n    E5 G5  D5          A5\nHey I, oh, I'm still alive\n      B5\nHey...oh\n\n\nOh, she walks slowly\nAcross a young man's room\nShe said I'm ready... for you\nI can't remember anything to this very day\n'Cept the look, the look\nF                C\nOh, you know where\n    F        C\nNow I can't see, I just stare\n\n\nE G D         A\n I, I'm still alive    \nE  G  D         A\nHey I, but, I'm still alive\n    E  G  D         A\nHey I, boy, I'm still alive\n    E G  D         A\nHey I, oh, I'm still alive, yeah\n\n![Ponte]\nB5  F#  B5  F#\nB5  F#  B5  F#\n\nA  A2  D5                       A   A2\n          Is something wrong, she said\n             A   A2     D5\nWell of course there is\n                      A   A2\nYou're still alive, she said\n                         B  B2  E5\nOh, and do I deserve to be\n                  B  B2\nIs that the question\n        B  B2       E5\nAnd if so,    if so\n         B5  B2\nWho answers,    who answers\n\n\nE5 G5  D5          A2\nI, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5               D5  A2\nHey I, hmm, I'm still alive,  yeah, yeah\n\n[Solo] E5  G5  D5  A5","fontSize":14,"columns":2,"lineHeight":1.5}]; var shows = [{"id":1773605541212,"name":"Pacto","songs":[{"id":1772726812632,"title":"Alive","artist":"Pearl Jam","key":"E","preset":"Vox","cifra":"Intro] A5\n\n[Primeira Parte]\n\nSon, she said\nHave I got a little story for you\nWhat you thought was your daddy\nWas nothin' but a\nWhile you were sittin'\nHome alone at age thirteen\nYour real daddy was dyin'\n                  F      C\nSorry you didn't see him\n          F         C\nBut I'm glad we talked\n\n[Refrão]\n\n   E5 G5  D5        A5\nOh I, oh, I'm still alive\n     E5 G5  D5        A5\nHey, I, oh, I'm still alive\n    E5 G5  D5          A5\nHey I, oh, I'm still alive\n      B5\nHey...oh\n\n[Segunda Parte]\n\nOh, she walks slowly\nAcross a young man's room\nShe said I'm ready... for you\nI can't remember anything to this very day\n'Cept the look, the look\nF                C\nOh, you know where\n    F        C\nNow I can't see, I just stare\n\n[Segundo Refrão]\n\nE5 G5 D5         A5\n   I, I'm still alive    E5  G5  D5         A5\nHey I, but, I'm still alive\n    E5  G5  D5         A5\nHey I, boy, I'm still alive\n    E5 G5  D5         A5\nHey I, oh, I'm still alive, yeah\n\n[Ponte] B5  F#  B5  F#\n        B5  F#  B5  F#\n\n[Terceira Parte]\n\nA  A2  D5                       A   A2\n          Is something wrong, she said\n             A   A2     D5\nWell of course there is\n                      A   A2\nYou're still alive, she said\n                         B  B2  E5\nOh, and do I deserve to be\n                  B  B2\nIs that the question\n        B  B2       E5\nAnd if so,    if so\n         B5  B2\nWho answers,    who answers\n\n[Terceiro Refrão]\n\nE5 G5  D5          A2\nI, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5               D5  A2\nHey I, hmm, I'm still alive,  yeah, yeah\n\n[Solo] E5  G5  D5  A5","fontSize":10,"lineHeight":1.1999999999999997,"columns":2},{"id":1773604125584,"title":"Creep","artist":"Radiohead","key":"G","preset":"Creep","cifra":"[Intro] G  B  C  Cm\n\n                      G\nWhen you were here before\n                         B\nCouldn't look you in the eye\n                    C\nYou're just like an angel\n                     Cm\nYour skin makes me cry\n\n[Segunda Parte]\n\n                  G\nYou float like a feather\n                B\nIn a beautiful world\n               C\nI wish I was special\n                    Cm\nYou're so fucking special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n\n\n                    G\nI don't care if it hurts\n                  B\nI wanna have control\n                   C\nI wanna a perfect body\n                   Cm\nI wanna a perfect soul\n\n\n\n\n\n\n\n\n\n               G\nI want you to notice\n               B\nWhen I'm not around\n                    C\nYou're so fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n            Cm\nI don't belong here\n\n\n  G                        B\nShe's running out the door\n  C\nShe's running out\n     Cm                G  B\nShe run, run, run, run\n C  Cm\nRun\n\n\n                    G\nWhatever makes you happy\n              B\nWhatever you want\n             C\nSo fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n           G\nI don't belong here","fontSize":16,"lineHeight":1.7000000000000002,"columns":3},{"id":1772723119296,"title":"Jack Tequila","artist":"Skank","key":"C","preset":"Clean","cifra":"[Intro] C  F  C  F\n        C  F  C  F\n\n[Primeira Parte]\n\nC     F\nFunk lá no morro da mangueira\n             C                  F\nEssa menina tá dizendo, sim eu sei\n C                     F\nNoite bamba, tudo à beça\n   C                     F\nBaião na rampa do cruzeiro\n             C                   F\nEssa menina tá dizendo don't worry\n                     C                 F\nCause everything is gonna be all right\n              C\nEverything, every tune\n                F\nWill be played by night\n    C        F\nOh yeh eh oh oh\n\n[Refrão]\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n( C  F  C  F )\n( C  F  C  F )\n\n[Segunda Parte]\n\n        C                F\nReggae lá na rádio do café\n            C                   F\nRapaziada que estiver afim vai lá\n        C            F\nEu vou ficar com Jackie oh\n   C                  F\nSe é que Jackie vai pra lá\n          C       F\nE se não for, já foi\n         C                 F\nO bonde do desejo segue rumo\n C                F\nCaixa, bumbo e sexo\n         C                   F\nSaudade na rampa do mundo oh oh\n\n[Refrão]\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n( C  F  C  F )\n( C  F  C  F )\n\n[Terceira Parte]\n\n C\nJackie foi nascer\n        F\nNuma cabana em noa noa\n C               F\nSol do taiti na pele, now boa\n     C\nSeu pai cruzou o mar\n      F\nDuas filhas na canoa\n C                F\nCôco pra beber e leite de leoa\n C\nJackie é uma menina\n       F\nTão bonita que enjoa\n\n   C                 F\nEnjôo de vertigem, viagem de avião\n C                     F\nHálito de virgem, dois olhos de amêndoa   C             F\nVaca, cadela, macaca, gazela\n C           F\nLinda toda, toda linda ela\n C              F\nToda beleza se reconhece nela\n C              F\nJackie tequila coca-cola e água\nC              F\nÉgua, língua, mingua minha mágoa\n   C       F\nOh oh yeh\n\n( C  F  C  F )\n( C  F  C  F )\n\n[Primeira Parte]\n\n      C                       F\nFunk lá no morro da mangueira\n             C                  F\nEssa menina tá dizendo, sim eu sei\n C                     F\nNoite bamba, tudo à beça\n   C                     F\nBaião na rampa do cruzeiro\n             C                   F\nEssa menina tá dizendo don't worry\n                     C                 F\nCause everything is gonna be all right\n              C\nEverything, every tune\n                F\nWill be played by night\n    C        F\nOh yeh eh oh oh\n\n[Refrão]\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n( C  F  C  F )\n( C  F  C  F )\n\n[Terceira Parte]\n\n C\nJackie foi nascer\n        F\nNuma cabana em noa noa\n C               F\nSol do taiti na pele, now boa\n     C\nSeu pai cruzou o mar\n      F\nDuas filhas na canoa\n C                F\nCôco pra beber e leite de leoa\n C\nJackie é uma menina\n       F\nTão bonita que enjoa\n\n   C                 F\nEnjôo de vertigem, viagem de avião\n C                     F\nHálito de virgem, dois olhos de amêndoa\n   C             F\nVaca, cadela, macaca, gazela\n C           F\nLinda toda, toda linda ela\n C              F\nToda beleza se reconhece nela\n C               F\nJackie tequila coca-cola e água\nC              F\nÉgua, língua, mingua minha mágoa\n   C       F\nOh oh yeh\n\n[Final] C  F  C  F\n        C  F  C  F  C","fontSize":11,"lineHeight":1.1999999999999997,"columns":3}],"created":"15/03/2026"}];
 
-const notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+var currentShowSongs = null, playIndex = 0, transpose = 0, searchTerm = '', currentArtistFilter = null;
+var edFontSize = 18, edColumns = 1, edLineHeight = 1.3, scrollInterval = null, isIpadView = false;
+var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
 function setTab(t) {
-    var tabs = document.getElementsByClassName('tab-content');
-    for(var i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
-    var navs = document.getElementsByClassName('nav-item');
-    for(var i=0; i<navs.length; i++) navs[i].classList.remove('active');
-    document.getElementById('tab-' + t).classList.add('active');
-    document.getElementById('btn-tab-' + t).classList.add('active');
-    if (t === 'musicas') renderBiblioteca();
-    if (t === 'shows') renderShows();
-    if (t === 'editor') updateEditorPreview();
+    var tabs = document.getElementsByClassName('tab-content'); for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+    var navs = document.getElementsByClassName('nav-item'); for (var i = 0; i < navs.length; i++) navs[i].classList.remove('active');
+    document.getElementById('tab-' + t).classList.add('active'); document.getElementById('btn-tab-' + t).classList.add('active');
+    if (t === 'musicas') renderBiblioteca(); if (t === 'shows') renderShows(); if (t === 'editor') updateEditorPreview();
 }
 
-function renderSongContent(container, cifraText, columns, fontSize, tp) {
+function toggleIpadView() {
+    isIpadView = !isIpadView;
+    var preview = document.getElementById('editor-preview');
+    var btn = document.getElementById('btn-ipad-toggle');
+    if(isIpadView) {
+        preview.classList.add('ipad-frame');
+        document.body.classList.add('ipad-mode-on');
+        btn.classList.add('btn-active');
+    } else {
+        preview.classList.remove('ipad-frame');
+        document.body.classList.remove('ipad-mode-on');
+        btn.classList.remove('btn-active');
+    }
+}
+
+function renderSongContent(container, cifraText, columns, fontSize, spacing, tp) {
     container.style.columnCount = columns;
     container.style.fontSize = fontSize + 'px';
+    container.style.lineHeight = spacing;
     
-    var sections = cifraText.split('\n---\n');
-    var finalHtml = '';
-    for(var i=0; i<sections.length; i++) {
-        var paragraphs = sections[i].split('\n\n');
-        var colStyle = i > 0 ? 'style="-webkit-column-break-before: always; break-before: column;"' : '';
+    var sections = cifraText.split('\n---\n'), finalHtml = '';
+    for (var i = 0; i < sections.length; i++) {
+        var paragraphs = sections[i].split('\n\n'), colStyle = i > 0 ? 'style="-webkit-column-break-before: always; break-before: column;"' : '';
         finalHtml += '<div ' + colStyle + '>';
-        for(var j=0; j<paragraphs.length; j++) {
-            if(!paragraphs[j].trim()) continue;
+        for (var j = 0; j < paragraphs.length; j++) {
+            if (!paragraphs[j].trim()) continue;
             finalHtml += '<div class="verse-block">';
             var lines = paragraphs[j].split('\n');
-            for(var k=0; k<lines.length; k++) { finalHtml += formatLine(lines[k], tp); }
+            for (var k = 0; k < lines.length; k++) finalHtml += formatLine(lines[k], tp);
             finalHtml += '</div>';
         }
         finalHtml += '</div>';
@@ -182,24 +191,17 @@ function formatLine(t, tp) {
 }
 
 function transposeChord(chord, steps) {
-    var match = chord.match(/^([A-G])(#|b)?(.*)$/);
-    if (!match) return chord;
-    var root = match[1] + (match[2] || '');
-    var rest = match[3] || '';
-    var idx = notesSharp.indexOf(root);
-    if (idx === -1) idx = notesFlat.indexOf(root);
-    if (idx === -1) return chord;
-    var newIdx = (idx + steps + 12) % 12;
-    return notesSharp[newIdx] + rest;
+    var match = chord.match(/^([A-G])(#|b)?(.*)$/); if (!match) return chord;
+    var root = match[1] + (match[2] || ''), rest = match[3] || '', idx = notesSharp.indexOf(root);
+    if (idx === -1) idx = notesFlat.indexOf(root); if (idx === -1) return chord;
+    var newIdx = (idx + steps + 12) % 12; return notesSharp[newIdx] + rest;
 }
 
 function renderBiblioteca() {
     var div = document.getElementById('biblioteca-list');
-    var filtradas = library.filter(function(m) {
-        return (m.title.toLowerCase().indexOf(searchTerm) > -1 || m.artist.toLowerCase().indexOf(searchTerm) > -1) && (!currentArtistFilter || m.artist === currentArtistFilter);
-    });
+    var filtradas = library.filter(function(m) { return (m.title.toLowerCase().indexOf(searchTerm) > -1 || m.artist.toLowerCase().indexOf(searchTerm) > -1) && (!currentArtistFilter || m.artist === currentArtistFilter); });
     div.innerHTML = filtradas.map(function(m) {
-        return '<div class="card-song"><div onclick="viewSingleSong(' + m.id + ')" style="flex:1"><div style="font-weight:bold; font-size:17px;">' + esc(m.title) + '</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">' + esc(m.artist) + '</div></div>' +
+        return '<div class="card-song"><div onclick="viewSingleSong(' + m.id + ')" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">' + esc(m.title) + '</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">' + esc(m.artist) + '</div></div>' +
             '<div style="display:flex;"><button onclick="openAddToShow(' + m.id + ')" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button>' +
             '<button onclick="editMusic(' + m.id + ')" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button>' +
             '<button onclick="deleteMusic(' + m.id + ')" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div>';
@@ -208,126 +210,80 @@ function renderBiblioteca() {
 }
 
 function renderArtistTabs() {
-    var tabs = document.getElementById('artist-tabs');
-    var artistas = [];
-    for(var i=0; i<library.length; i++) { if(artistas.indexOf(library[i].artist) === -1) artistas.push(library[i].artist); }
+    var tabs = document.getElementById('artist-tabs'), artistas = [];
+    for (var i = 0; i < library.length; i++) { if (artistas.indexOf(library[i].artist) === -1) artistas.push(library[i].artist); }
     artistas.sort();
-    var html = '<button onclick="filterArtist(null)" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; background:' + (!currentArtistFilter ? '#22c55e' : '#1e293b') + '; color:' + (!currentArtistFilter ? '#000' : '#fff') + '">Todos</button>';
-    artistas.forEach(function(a) { html += '<button onclick="filterArtist(\''+esc(a)+'\')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:' + (currentArtistFilter === a ? '#22c55e' : '#1e293b') + '; color:' + (currentArtistFilter === a ? '#000' : '#fff') + '">' + esc(a) + '</button>'; });
+    var html = '<button onclick="filterArtist(null)" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; background:' + (!currentArtistFilter ? '#22c55e' : '#1e293b') + '; color:' + (!currentArtistFilter ? '#000' : '#fff') + '; font-weight:bold;">Todos</button>';
+    artistas.forEach(function(a) { html += '<button onclick="filterArtist(\'' + esc(a) + '\')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:' + (currentArtistFilter === a ? '#22c55e' : '#1e293b') + '; color:' + (currentArtistFilter === a ? '#000' : '#fff') + '; font-weight:bold;">' + esc(a) + '</button>'; });
     tabs.innerHTML = html;
 }
 
+function saveToLibrary() {
+    var title = document.getElementById('ed-title').value, cifra = document.getElementById('ed-cifra').value;
+    if (!title || !cifra) return alert("Preencha Título e Cifra");
+    var song = { id: Date.now(), title: title, artist: document.getElementById('ed-artist').value || "Desconhecido", key: document.getElementById('ed-key').value, preset: document.getElementById('ed-preset').value, cifra: cifra, fontSize: edFontSize, columns: edColumns, lineHeight: edLineHeight };
+    var idx = -1; for (var i = 0; i < library.length; i++) { if (library[i].title == song.title && library[i].artist == song.artist) idx = i; }
+    if (idx >= 0) library[idx] = song; else library.push(song);
+    localStorage.setItem('biblio', JSON.stringify(library)); alert("Salvo!"); setTab('musicas');
+}
+
+function editMusic(id) {
+    var m = library.find(function(x) { return x.id == id; });
+    document.getElementById('ed-title').value = m.title; document.getElementById('ed-artist').value = m.artist;
+    document.getElementById('ed-key').value = m.key; document.getElementById('ed-preset').value = m.preset || ''; document.getElementById('ed-cifra').value = m.cifra;
+    edFontSize = m.fontSize || 18; edColumns = m.columns || 1; edLineHeight = m.lineHeight || 1.3; setTab('editor');
+}
+
+function exportarMasterApp() {
+    var html = document.documentElement.outerHTML;
+    var dataInjection = 'var library = ' + JSON.stringify(library) + '; var shows = ' + JSON.stringify(shows) + ';';
+    var regex = /var library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\];\s+var shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
+    if (html.match(regex)) {
+        html = html.replace(regex, dataInjection);
+        var blob = new Blob([html], { type: 'text/html' });
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'TATU_PRO_IPAD.html'; a.click();
+    } else alert("Erro na exportação.");
+}
+
+function updateEditorPreview() { renderSongContent(document.getElementById('editor-preview'), document.getElementById('ed-cifra').value, edColumns, edFontSize, edLineHeight, 0); }
+function changeEdFont(v) { edFontSize += v; updateEditorPreview(); }
+function changeEdSpacing(v) { edLineHeight = parseFloat((edLineHeight + v).toFixed(1)); updateEditorPreview(); }
+function setEdCols(v) { edColumns = v; updateEditorPreview(); }
+
+function createShow() { var n = prompt("Nome do Show:"); if (!n) return; shows.push({ id: Date.now(), name: n, songs: [] }); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); }
+function renderShows() { var div = document.getElementById('shows-list'); div.innerHTML = shows.map(function(s) { return '<div class="card-song"><div><div style="font-weight:bold; color:#22c55e; font-size:18px;">' + esc(s.name) + '</div><div style="font-size:11px; font-weight:bold;">' + s.songs.length + ' MÚSICAS</div></div><div style="display:flex;"><button class="btn-ui btn-blue" style="padding:6px 12px; margin-right:8px;" onclick="playShow(' + s.id + ')">TOCAR</button><button onclick="deleteShow(' + s.id + ')" style="background:none; border:none; color:#ef4444; padding:5px; font-size:18px;">🗑</button></div></div>'; }).join(''); }
+function openAddToShow(songId) { var list = document.getElementById('modal-shows-list'); list.innerHTML = shows.length ? shows.map(function(sh) { return '<button class="btn-ui btn-ghost" style="width:100%; margin-bottom:8px; text-align:left;" onclick="addToShow(' + sh.id + ',' + songId + ')">➕ ' + esc(sh.name) + '</button>'; }).join('') : 'Crie um show primeiro!'; document.getElementById('modal-add').style.display = 'flex'; }
+function addToShow(showId, songId) { var sh = shows.find(function(x) { return x.id == showId; }), sg = library.find(function(x) { return x.id == songId; }); sh.songs.push(JSON.parse(JSON.stringify(sg))); localStorage.setItem('shows', JSON.stringify(shows)); closeModal(); alert("Adicionado!"); }
+
+function esc(t) { return t ? t.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
+function closeModal() { document.getElementById('modal-add').style.display = 'none'; }
+function searchSongs() { searchTerm = document.getElementById('search-input').value.toLowerCase(); renderBiblioteca(); }
+function filterArtist(a) { currentArtistFilter = a; renderBiblioteca(); }
+function transposeUp() { transpose++; renderPlay(); }
+function transposeDown() { transpose--; renderPlay(); }
+function playPrev() { if (playIndex > 0) { playIndex--; renderPlay(); } }
+function playNext() { if (playIndex < currentShowSongs.length - 1) { playIndex++; renderPlay(); } }
+function backToMenu() { if (scrollInterval) toggleScroll(); document.getElementById('show-play-screen').classList.remove('active'); }
 function viewSingleSong(id) { var m = library.find(function(x) { return x.id == id; }); currentShowSongs = [m]; playIndex = 0; transpose = 0; openPlayer(); }
+function playShow(id) { var s = shows.find(function(x) { return x.id == id; }); if (s.songs.length) { currentShowSongs = s.songs; playIndex = 0; transpose = 0; openPlayer(); } }
 function openPlayer() { document.getElementById('show-play-screen').classList.add('active'); renderPlay(); }
 function renderPlay() {
     var s = currentShowSongs[playIndex];
     document.getElementById('play-title').textContent = s.title;
     document.getElementById('play-meta').textContent = s.artist + " • Tom: " + (s.key || 'N/A') + (s.preset ? ' • ' + s.preset : '');
     document.getElementById('transpose-val').textContent = transpose;
-    // Aqui garantimos que ele use o fontSize salvo na música
-    renderSongContent(document.getElementById('play-lyrics'), s.cifra, s.columns || 1, s.fontSize || 18, transpose);
+    renderSongContent(document.getElementById('play-lyrics'), s.cifra, s.columns || 1, s.fontSize || 18, s.lineHeight || 1.3, transpose);
 }
-
-function saveToLibrary() {
-    var song = {
-        id: Date.now(),
-        title: document.getElementById('ed-title').value,
-        artist: document.getElementById('ed-artist').value,
-        key: document.getElementById('ed-key').value,
-        preset: document.getElementById('ed-preset').value,
-        cifra: document.getElementById('ed-cifra').value,
-        fontSize: edFontSize, // Salva o tamanho atual
-        columns: edColumns
-    };
-    if(!song.title || !song.cifra) return alert("Preencha Título e Cifra");
-    var idx = -1;
-    for(var i=0; i<library.length; i++) { if(library[i].title == song.title && library[i].artist == song.artist) idx = i; }
-    if(idx >= 0) library[idx] = song; else library.push(song);
-    localStorage.setItem('biblio', JSON.stringify(library));
-    alert("Salvo!");
-    setTab('musicas');
-}
-
-function editMusic(id) {
-    var m = library.find(function(x) { return x.id == id; });
-    document.getElementById('ed-title').value = m.title;
-    document.getElementById('ed-artist').value = m.artist;
-    document.getElementById('ed-key').value = m.key;
-    document.getElementById('ed-preset').value = m.preset || '';
-    document.getElementById('ed-cifra').value = m.cifra;
-    edFontSize = m.fontSize || 16;
-    edColumns = m.columns || 1;
-    setTab('editor');
-}
-
-function changeEdFont(v) { 
-    edFontSize += v; 
-    document.getElementById('font-size-display').textContent = edFontSize + 'px';
-    updateEditorPreview(); 
-}
-function setEdCols(v) { edColumns = v; updateEditorPreview(); }
-function updateEditorPreview() { 
-    // CORREÇÃO: Agora usa a variável edFontSize em vez de 13 fixo
-    renderSongContent(document.getElementById('editor-preview'), document.getElementById('ed-cifra').value, edColumns, edFontSize, 0); 
-}
-
-function createShow() { var n = prompt("Nome do Show:"); if(n) { shows.push({ id: Date.now(), name: n, songs: [] }); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
-function renderShows() {
-    var div = document.getElementById('shows-list');
-    div.innerHTML = shows.map(function(s) {
-        return '<div class="card-song"><div><div style="font-weight:bold; color:#22c55e;">'+esc(s.name)+'</div><div>'+s.songs.length+' músicas</div></div><div style="display:flex;"><button class="btn-ui btn-blue" onclick="playShow('+s.id+')">TOCAR</button><button onclick="deleteShow('+s.id+')" style="background:none; border:none; color:#ef4444; margin-left:10px;">🗑</button></div></div>';
-    }).join('');
-}
-
-function openAddToShow(songId) {
-    var list = document.getElementById('modal-shows-list');
-    list.innerHTML = shows.length ? shows.map(function(sh) { return '<button class="btn-ui btn-ghost" style="width:100%; margin-bottom:8px; text-align:left;" onclick="addToShow('+sh.id+','+songId+')">➕ '+esc(sh.name)+'</button>'; }).join('') : 'Crie um show primeiro';
-    document.getElementById('modal-add').style.display = 'flex';
-}
-
-function addToShow(showId, songId) {
-    var sh = shows.find(function(x) { return x.id == showId; });
-    var sg = library.find(function(x) { return x.id == songId; });
-    sh.songs.push(JSON.parse(JSON.stringify(sg)));
-    localStorage.setItem('shows', JSON.stringify(shows));
-    closeModal();
-    alert("Adicionado!");
-}
-
-function exportarMasterApp() {
-    var html = document.documentElement.outerHTML;
-    var dataInjection = 'let library = ' + JSON.stringify(library) + '; let shows = ' + JSON.stringify(shows) + ';';
-    var regex = /let library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\]; let shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
-    html = html.replace(regex, dataInjection);
-    var blob = new Blob([html], { type: 'text/html' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'TATU_IPAD_PRO.html';
-    a.click();
-}
-
 function toggleScroll() {
-    var btn = document.getElementById('btn-scroll');
-    var container = document.getElementById('play-lyrics');
+    var btn = document.getElementById('btn-scroll'), container = document.getElementById('play-lyrics');
     if (scrollInterval) { clearInterval(scrollInterval); scrollInterval = null; btn.textContent = '▶'; }
     else { btn.textContent = '⏸'; scrollInterval = setInterval(function() { container.scrollTop += 1; }, 50); }
 }
-
-function closeModal() { document.getElementById('modal-add').style.display = 'none'; }
-function backToMenu() { if(scrollInterval) toggleScroll(); document.getElementById('show-play-screen').classList.remove('active'); }
-function searchSongs() { searchTerm = document.getElementById('search-input').value.toLowerCase(); renderBiblioteca(); }
-function filterArtist(a) { currentArtistFilter = a; renderBiblioteca(); }
-function transposeUp() { transpose++; renderPlay(); }
-function transposeDown() { transpose--; renderPlay(); }
-function playPrev() { if(playIndex > 0) { playIndex--; renderPlay(); } }
-function playNext() { if(playIndex < currentShowSongs.length - 1) { playIndex++; renderPlay(); } }
-function deleteMusic(id) { if(confirm("Excluir?")) { library = library.filter(function(x){return x.id!=id}); localStorage.setItem('biblio', JSON.stringify(library)); renderBiblioteca(); } }
-function deleteShow(id) { if(confirm("Excluir?")) { shows = shows.filter(function(x){return x.id!=id}); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
+function deleteMusic(id) { if (confirm("Excluir?")) { library = library.filter(function(x) { return x.id != id; }); localStorage.setItem('biblio', JSON.stringify(library)); renderBiblioteca(); } }
+function deleteShow(id) { if (confirm("Excluir?")) { shows = shows.filter(function(x) { return x.id != id; }); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
 function clearEditor() { document.getElementById('ed-title').value=''; document.getElementById('ed-artist').value=''; document.getElementById('ed-cifra').value=''; updateEditorPreview(); }
-function esc(t) { return t ? t.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
-function playShow(id) { var s = shows.find(function(x) { return x.id == id; }); if(s.songs.length) { currentShowSongs = s.songs; playIndex = 0; transpose = 0; openPlayer(); } }
 
 renderBiblioteca();
 </script>
-</body>
-</html>
+
+</body></html>
