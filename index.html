@@ -3,279 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tatu Chords Pro</title>
+    <title>Tatu Chords Pro - IPAD FIX</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Roboto+Mono:wght@500;700&display=swap');
+        /* CSS DE ALTA COMPATIBILIDADE PARA IOS 12 */
+        body { 
+            font-family: Helvetica, Arial, sans-serif; 
+            background-color: #020617; 
+            color: #f1f5f9; 
+            margin: 0; 
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Forçar esconder as seções que não estão ativas */
+        .tab-content { display: none !important; }
+        .tab-content.active { display: block !important; }
+
+        /* Estilo das Abas */
+        .nav-container { 
+            display: flex; 
+            background: #0f172a; 
+            margin: 10px; 
+            border-radius: 8px; 
+            border: 1px solid #334155;
+            overflow: hidden;
+        }
+        .nav-item { 
+            flex: 1; 
+            padding: 15px; 
+            text-align: center; 
+            font-weight: bold; 
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        .nav-item.active { 
+            background: #22c55e; 
+            color: #000; 
+        }
+
+        /* Botões e Inputs Compatíveis */
+        .btn-base { 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            border: none; 
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-green { background: #22c55e; color: #000; }
+        .btn-blue { background: #3b82f6; color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid #475569; color: #fff; }
         
-        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f1f5f9; overflow-x: hidden; }
-        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .input-dark { 
+            background: #000; 
+            border: 1px solid #334155; 
+            color: #fff; 
+            padding: 12px; 
+            width: 100%; 
+            border-radius: 8px; 
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Listagem de Músicas */
+        .song-card { 
+            background: #0f172a; 
+            border: 1px solid #1e293b; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Player de Performance (Fix para iOS 12) */
+        #show-play-screen { 
+            position: fixed; 
+            top: 0; left: 0; right: 0; bottom: 0; 
+            background: #000; 
+            z-index: 9999; 
+            display: none; 
+            flex-direction: column; 
+        }
+        #show-play-screen.active { display: flex !important; }
+
+        .player-header, .player-footer { 
+            background: #0f172a; 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        /* Cifras */
+        .chord { color: #4ade80; font-weight: bold; font-family: 'Courier New', monospace; }
+        .lyric-line { color: #fff; font-size: 1.1em; margin-bottom: 4px; }
+        .verse-block { margin-bottom: 20px; break-inside: avoid; }
+        .lyrics-container { column-gap: 20px; column-fill: auto; }
         
-        /* FIX PARA IOS ANTIGO (DAISYUI FALLBACK) */
-        .bg-slate-900 { background-color: #0f172a !important; }
-        .bg-black { background-color: #000000 !important; }
-        .btn-success { background-color: #22c55e !important; color: #000 !important; }
-        .btn-primary { background-color: #3b82f6 !important; color: #fff !important; }
-        .btn-ghost { background: transparent !important; border: 1px solid #334155 !important; }
-        .text-green-400 { color: #4ade80 !important; }
-        .text-blue-400 { color: #60a5fa !important; }
-        
-        /* FIX PARA O GAP (Safari 12 não suporta gap em flex) */
-        .flex { display: -webkit-box; display: -webkit-flex; display: flex; }
-        .gap-2 > * { margin: 4px; }
-        .gap-4 > * { margin: 8px; }
-
-        /* Estilo da Cifra */
-        .chord { color: #4ade80; font-weight: 700; height: 1.25rem; white-space: pre; font-size: 1.1em; }
-        .lyric-line { color: #e2e8f0; font-weight: 600; line-height: 1.3; margin-bottom: 3px; }
-        .note { color: #f87171; font-style: italic; border-left: 4px solid #f87171; padding-left: 10px; margin: 12px 0; background: rgba(248, 113, 113, 0.1); padding-top: 4px; padding-bottom: 4px; }
-        .verse-block { margin-bottom: 1.8rem; break-inside: avoid; }
-
-        .lyrics-container { column-gap: 2rem; column-fill: auto; height: auto; }
-
-        /* Fullscreen */
-        #show-play-screen.is-fullscreen .player-ui { display: none !important; }
-        #show-play-screen.is-fullscreen #play-lyrics { padding-top: 30px; }
-
-        /* Tabs manuais para garantir que apareçam */
-        .tab { padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; flex: 1; text-align: center; }
-        .tab-active { background-color: #22c55e !important; color: #000 !important; }
-
-        /* Modal fallback para iPad */
-        .modal-custom { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: center; justify-content: center; }
-        .modal-box { background: #0f172a; border: 1px solid #334155; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; }
+        /* Modal */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.9); z-index: 10000; 
+            display: none; align-items: center; justify-content: center; 
+        }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
-<div id="main-app" class="max-w-4xl mx-auto pb-10">
-    <header class="p-6 text-center">
-        <h1 class="text-3xl font-bold text-green-400">TATU CHORDS</h1>
+<div id="main-ui">
+    <header style="padding: 20px; text-align: center;">
+        <h1 style="color: #4ade80; font-size: 24px; font-weight: bold;">TATU CHORDS PRO</h1>
     </header>
 
     <!-- Navegação -->
-    <div class="px-4 mb-6">
-        <div class="flex bg-slate-900 border border-slate-800 p-1 w-full rounded-xl">
-            <button class="tab tab-active" id="tab-btn-musicas" onclick="setTab('musicas')">Músicas</button>
-            <button class="tab" id="tab-btn-shows" onclick="setTab('shows')">Shows</button>
-            <button class="tab" id="tab-btn-editor" onclick="setTab('editor')">Editor</button>
-        </div>
+    <div class="nav-container">
+        <div class="nav-item active" id="btn-tab-musicas" onclick="setTab('musicas')">Músicas</div>
+        <div class="nav-item" id="btn-tab-shows" onclick="setTab('shows')">Shows</div>
+        <div class="nav-item" id="btn-tab-editor" onclick="setTab('editor')">Editor</div>
     </div>
 
     <!-- ABA: MÚSICAS -->
-    <section id="tab-musicas" class="tab-content px-4">
-        <input type="text" id="search-input" placeholder="Buscar música ou artista..." 
-               class="p-4 rounded-lg w-full bg-slate-900 border border-slate-700 mb-6 text-white" oninput="searchSongs()">
-        <div id="artist-tabs" class="flex overflow-x-auto no-scrollbar mb-6 pb-2" style="-webkit-overflow-scrolling: touch;"></div>
-        <div id="biblioteca-list" class="flex flex-col"></div>
+    <section id="tab-musicas" class="tab-content active" style="padding: 0 15px;">
+        <input type="text" id="search-input" placeholder="Buscar música ou artista..." class="input-dark" oninput="searchSongs()">
+        <div id="artist-tabs" style="display: flex; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px;"></div>
+        <div id="biblioteca-list"></div>
     </section>
 
     <!-- ABA: SHOWS -->
-    <section id="tab-shows" class="tab-content hidden px-4">
-        <div class="flex mb-6">
-            <button class="btn-primary p-3 rounded-lg flex-1" onclick="createShow()">➕ Novo Show</button>
-            <button class="btn-ghost p-3 rounded-lg ml-2 text-green-400" onclick="exportarMasterApp()">GERAR APP IPAD</button>
+    <section id="tab-shows" class="tab-content" style="padding: 0 15px;">
+        <div style="display: flex; margin-bottom: 15px;">
+            <button class="btn-base btn-blue" style="flex: 1; margin-right: 10px;" onclick="createShow()">➕ Novo Show</button>
+            <button class="btn-base btn-outline" onclick="exportarMasterApp()">GERAR APP IPAD</button>
         </div>
-        <div id="shows-list" class="flex flex-col"></div>
+        <div id="shows-list"></div>
     </section>
 
     <!-- ABA: EDITOR -->
-    <section id="tab-editor" class="tab-content hidden px-4 pb-10">
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-            <div class="flex flex-col mb-4">
-                <input id="ed-title" placeholder="Título" class="p-3 bg-black border border-slate-700 rounded mb-2">
-                <input id="ed-artist" placeholder="Artista" class="p-3 bg-black border border-slate-700 rounded">
+    <section id="tab-editor" class="tab-content" style="padding: 0 15px;">
+        <div style="background: #0f172a; padding: 15px; border-radius: 12px;">
+            <input id="ed-title" placeholder="Título" class="input-dark">
+            <input id="ed-artist" placeholder="Artista" class="input-dark">
+            <div style="display: flex;">
+                <input id="ed-key" placeholder="Tom" class="input-dark" style="margin-right: 10px; color: #4ade80;">
+                <input id="ed-preset" placeholder="Preset POD" class="input-dark">
             </div>
-            <div class="flex mb-4">
-                <input id="ed-key" placeholder="Tom" class="p-3 bg-black border border-slate-700 rounded flex-1 mr-2 text-green-400 font-bold">
-                <input id="ed-preset" placeholder="Preset POD" class="p-3 bg-black border border-slate-700 rounded flex-1 text-blue-400">
-            </div>
+            <textarea id="ed-cifra" oninput="updateEditorPreview()" placeholder="Cifra aqui..." class="input-dark" style="height: 200px; font-family: monospace;"></textarea>
             
-            <textarea id="ed-cifra" oninput="updateEditorPreview()" placeholder="Cifra aqui..." 
-                      class="w-full h-48 font-mono bg-black border border-slate-700 p-3 rounded mb-4"></textarea>
-
-            <div class="flex justify-between items-center bg-black p-2 rounded-lg mb-4">
-                <div class="flex">
-                    <button class="bg-slate-800 p-2 rounded mr-1" onclick="changeEdFont(-1)">A-</button>
-                    <button class="bg-slate-800 p-2 rounded" onclick="changeEdFont(1)">A+</button>
-                </div>
-                <div class="flex">
-                    <button class="bg-slate-800 p-2 rounded mr-1" onclick="setEdCols(1)">1 Col</button>
-                    <button class="bg-slate-800 p-2 rounded" onclick="setEdCols(2)">2 Col</button>
-                </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <button class="btn-base btn-outline" onclick="setEdCols(1)">1 Col</button>
+                <button class="btn-base btn-outline" onclick="setEdCols(2)">2 Col</button>
             </div>
 
-            <div id="editor-preview" class="bg-black border border-slate-800 rounded-xl p-4 min-h-[200px] mb-6"></div>
-
-            <div class="flex">
-                <button class="btn-success p-4 rounded-xl flex-1 font-bold" onclick="saveToLibrary()">💾 Salvar</button>
-                <button class="ml-4 text-slate-400" onclick="clearEditor()">Limpar</button>
-            </div>
+            <div id="editor-preview" style="background: #000; padding: 15px; border-radius: 8px; min-height: 150px; margin-bottom: 15px;"></div>
+            
+            <button class="btn-base btn-green" style="width: 100%;" onclick="saveToLibrary()">💾 Salvar na Biblioteca</button>
         </div>
     </section>
 </div>
 
-<!-- PLAYER DE PERFORMANCE -->
-<div id="show-play-screen" class="fixed inset-0 bg-black z-50 hidden flex flex-col">
-    <div class="player-ui p-4 bg-slate-900 flex justify-between items-center border-b border-slate-800">
-        <div class="flex items-center">
-            <button class="text-2xl mr-4" onclick="backToMenu()">✕</button>
+<!-- PLAYER -->
+<div id="show-play-screen">
+    <div class="player-header">
+        <div style="display: flex; align-items: center;">
+            <button onclick="backToMenu()" style="background: none; border: none; color: #fff; font-size: 24px; margin-right: 15px;">✕</button>
             <div>
-                <h2 id="play-title" class="font-bold text-green-400">Música</h2>
-                <p id="play-meta" class="text-xs text-slate-400"></p>
-                <p id="play-preset" class="text-[10px] text-blue-400 font-bold"></p>
+                <div id="play-title" style="font-bold; color: #4ade80;"></div>
+                <div id="play-meta" style="font-size: 12px; color: #94a3b8;"></div>
             </div>
         </div>
-        <div class="flex items-center">
-            <button class="bg-slate-800 w-10 h-10 rounded" onclick="transposeDown()">-</button>
-            <div class="w-8 text-center font-bold text-green-400" id="transpose-val">0</div>
-            <button class="bg-slate-800 w-10 h-10 rounded" onclick="transposeUp()">+</button>
+        <div style="display: flex; align-items: center;">
+            <button class="btn-base btn-outline" style="padding: 5px 15px;" onclick="transposeDown()">-</button>
+            <span id="transpose-val" style="margin: 0 10px; font-weight: bold;">0</span>
+            <button class="btn-base btn-outline" style="padding: 5px 15px;" onclick="transposeUp()">+</button>
         </div>
     </div>
 
-    <div id="play-lyrics" class="flex-1 overflow-auto p-6 no-scrollbar" onclick="toggleFullscreen()"></div>
+    <div id="play-lyrics" style="flex: 1; overflow-y: auto; padding: 20px;" class="no-scrollbar"></div>
 
-    <div class="player-ui p-4 bg-slate-900 flex justify-between items-center border-t border-slate-800">
-        <button class="p-2" id="btn-prev" onclick="playPrev()">Anterior</button>
-        <div class="flex items-center">
-            <button id="btn-scroll" class="bg-green-500 text-black w-10 h-10 rounded-full mr-4 font-bold" onclick="toggleScroll(event)">▶</button>
-            <input type="range" min="1" max="10" value="3" id="scroll-speed">
+    <div class="player-footer">
+        <button class="btn-base btn-outline" onclick="playPrev()">Anterior</button>
+        <div style="display: flex; align-items: center;">
+            <button id="btn-scroll" class="btn-base btn-green" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="toggleScroll()">▶</button>
         </div>
-        <button class="p-2" id="btn-next" onclick="playNext()">Próxima</button>
+        <button class="btn-base btn-outline" onclick="playNext()">Próxima</button>
     </div>
 </div>
 
-<!-- MODAL FALLBACK -->
-<div id="modal-add" class="modal-custom">
-    <div class="modal-box">
-        <h3 class="font-bold text-lg mb-4">Adicionar ao Show</h3>
-        <div id="modal-shows-list" class="flex flex-col"></div>
-        <button class="mt-4 w-full p-2 bg-slate-700 rounded" onclick="closeModal()">Fechar</button>
+<!-- MODAL -->
+<div id="modal-add" class="modal-overlay">
+    <div style="background: #0f172a; padding: 20px; border-radius: 15px; width: 80%;">
+        <h3 style="margin-bottom: 15px; font-bold;">Adicionar ao Show:</h3>
+        <div id="modal-shows-list"></div>
+        <button class="btn-base btn-outline" style="width: 100%; margin-top: 15px;" onclick="closeModal()">Fechar</button>
     </div>
 </div>
 
 <script>
-// --- LOGICA ORIGINAL (SEM ALTERAR VARIAVEIS) ---
+// --- BANCO DE DADOS ---
 let library = JSON.parse(localStorage.getItem('biblio')) || [];
 let shows = JSON.parse(localStorage.getItem('shows')) || [];
+
 let currentShowSongs = null;
 let playIndex = 0;
 let transpose = 0;
 let searchTerm = '';
 let currentArtistFilter = null;
-let edFontSize = 14;
+let edFontSize = 16;
 let edColumns = 1;
 let scrollInterval = null;
 
 const notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
+// --- NAVEGAÇÃO ---
 function setTab(t) {
-    document.querySelectorAll('.tab-content').forEach(x => x.classList.add('hidden'));
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('tab-active'));
-    document.getElementById('tab-' + t).classList.remove('hidden');
-    document.getElementById('tab-btn-' + t).classList.add('tab-active');
+    // Esconder todos
+    const tabs = document.querySelectorAll('.tab-content');
+    for(let i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
+    
+    const navs = document.querySelectorAll('.nav-item');
+    for(let i=0; i<navs.length; i++) navs[i].classList.remove('active');
+
+    // Mostrar selecionado
+    document.getElementById('tab-' + t).classList.add('active');
+    document.getElementById('btn-tab-' + t).classList.add('active');
+
     if (t === 'musicas') renderBiblioteca();
     if (t === 'shows') renderShows();
-    if (t === 'editor') updateEditorPreview();
 }
 
+// --- RENDERIZADOR DE CIFRA ---
 function renderSongContent(container, cifraText, columns, fontSize, tp) {
     container.style.columnCount = columns;
     container.style.fontSize = fontSize + 'px';
-    container.className = "lyrics-container no-scrollbar font-mono";
+    
     const sections = cifraText.split('\n---\n');
     let finalHtml = '';
-    sections.forEach((section, sIdx) => {
+    sections.forEach(function(section, sIdx) {
         const paragraphs = section.split('\n\n');
-        const sectionStyle = sIdx > 0 ? 'style="break-before: column; -webkit-column-break-before: always;"' : '';
-        finalHtml += `<div ${sectionStyle}>`;
-        paragraphs.forEach(para => {
+        const style = sIdx > 0 ? 'style="-webkit-column-break-before: always; break-before: column;"' : '';
+        finalHtml += '<div ' + style + '>';
+        paragraphs.forEach(function(para) {
             if(!para.trim()) return;
-            finalHtml += `<div class="verse-block">`;
-            para.split('\n').forEach(line => { finalHtml += formatLine(line, tp); });
-            finalHtml += `</div>`;
+            finalHtml += '<div class="verse-block">';
+            para.split('\n').forEach(function(line) { finalHtml += formatLine(line, tp); });
+            finalHtml += '</div>';
         });
-        finalHtml += `</div>`;
+        finalHtml += '</div>';
     });
     container.innerHTML = finalHtml;
 }
 
 function formatLine(t, tp) {
-    if (t.trim().startsWith('!')) return `<div class="note font-sans">${esc(t.substring(1))}</div>`;
-    if (!t.trim()) return '<div class="h-2"></div>';
+    if (t.trim().indexOf('!') === 0) return '<div style="color:#f87171; font-style:italic; border-left:3px solid #f87171; padding-left:10px; margin:10px 0;">' + esc(t.substring(1)) + '</div>';
+    if (!t.trim()) return '<div style="height:8px"></div>';
+    
     const tokens = t.trim().split(/\s+/);
-    const isChordLine = tokens.every(tk => /^[A-G](#|b)?(maj|min|m|dim|aug|sus|add|7|9|13|4|6|M)*(\/[A-G](#|b)?)?$/.test(tk));
+    const isChordLine = tokens.every(function(tk) {
+        return /^[A-G](#|b)?(maj|min|m|dim|aug|sus|add|7|9|13|4|6|M)*(\/[A-G](#|b)?)?$/.test(tk);
+    });
+
     if (isChordLine) {
-        const rendered = tp === 0 ? t : t.replace(/[A-G](?:#|b)?(?:maj|min|m|dim|aug|sus|add|7|9|13|4|6|M)*(?:\/[A-G](?:#|b)?)?/g, m => transposeChord(m, tp));
-        return `<div class="chord">${rendered}</div>`;
+        const rendered = tp === 0 ? t : t.replace(/[A-G](?:#|b)?(?:[a-zA-Z0-9]*)?(?:\/[A-G](?:#|b)?)?/g, function(m) {
+            return transposeChord(m, tp);
+        });
+        return '<div class="chord">' + rendered + '</div>';
     }
-    return `<div class="lyric-line font-sans">${esc(t)}</div>`;
+    return '<div class="lyric-line">' + esc(t) + '</div>';
 }
 
 function transposeChord(chord, steps) {
     const match = chord.match(/^([A-G])(#|b)?(.*)$/);
     if (!match) return chord;
-    let [ , root, acc, rest] = match;
-    let note = root + (acc || '');
-    let idx = notesSharp.indexOf(note);
-    if (idx === -1) idx = notesFlat.indexOf(note);
+    let root = match[1] + (match[2] || '');
+    let rest = match[3] || '';
+    let idx = notesSharp.indexOf(root);
+    if (idx === -1) idx = notesFlat.indexOf(root);
     if (idx === -1) return chord;
     let newIdx = (idx + steps + 12) % 12;
     return notesSharp[newIdx] + rest;
 }
 
-function toggleScroll(e) {
-    if(e) e.stopPropagation();
-    const btn = document.getElementById('btn-scroll');
-    const container = document.getElementById('play-lyrics');
-    if (scrollInterval) {
-        clearInterval(scrollInterval);
-        scrollInterval = null;
-        btn.textContent = '▶';
-    } else {
-        btn.textContent = '⏸';
-        const speed = document.getElementById('scroll-speed').value;
-        scrollInterval = setInterval(() => { container.scrollTop += 1; }, 110 - (speed * 10));
-    }
-}
-
+// --- BIBLIOTECA ---
 function renderBiblioteca() {
     const div = document.getElementById('biblioteca-list');
-    let filtradas = library.filter(m => 
-        (m.title.toLowerCase().indexOf(searchTerm) > -1 || m.artist.toLowerCase().indexOf(searchTerm) > -1) &&
-        (!currentArtistFilter || m.artist === currentArtistFilter)
-    );
-    div.innerHTML = filtradas.map(m => `
-        <div class="bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 mb-2">
-            <div onclick="viewSingleSong(${m.id})" class="cursor-pointer flex-1">
-                <h3 class="font-bold text-white text-lg">${esc(m.title)}</h3>
-                <p class="text-xs text-slate-500 uppercase font-bold">${esc(m.artist)}</p>
-            </div>
-            <div class="flex">
-                <button class="p-2 text-green-400" onclick="openAddToShow(${m.id})">➕</button>
-                <button class="p-2" onclick="editMusic(${m.id})">✏️</button>
-                <button class="p-2 text-red-500" onclick="deleteMusic(${m.id})">🗑</button>
-            </div>
-        </div>
-    `).join('');
+    let filtradas = library.filter(function(m) {
+        return (m.title.toLowerCase().indexOf(searchTerm) > -1 || m.artist.toLowerCase().indexOf(searchTerm) > -1) &&
+               (!currentArtistFilter || m.artist === currentArtistFilter);
+    });
+    
+    div.innerHTML = filtradas.map(function(m) {
+        return '<div class="song-card">' +
+            '<div onclick="viewSingleSong(' + m.id + ')" style="flex:1">' +
+                '<div style="font-weight:bold; font-size:18px;">' + esc(m.title) + '</div>' +
+                '<div style="font-size:12px; color:#64748b; text-transform:uppercase;">' + esc(m.artist) + '</div>' +
+            '</div>' +
+            '<div style="display:flex;">' +
+                '<button onclick="openAddToShow(' + m.id + ')" style="background:none; border:none; color:#22c55e; padding:10px; font-size:20px;">➕</button>' +
+                '<button onclick="deleteMusic(' + m.id + ')" style="background:none; border:none; color:#ef4444; padding:10px; font-size:20px;">🗑</button>' +
+            '</div>' +
+        '</div>';
+    }).join('');
     renderArtistTabs();
 }
 
 function renderArtistTabs() {
     const tabs = document.getElementById('artist-tabs');
-    const artistas = [...new Set(library.map(x => x.artist))].sort();
-    let html = `<button class="btn-ghost p-1 px-3 rounded mr-2 ${!currentArtistFilter ? 'bg-green-500 text-black' : ''}" onclick="filterArtist(null)">Todos</button>`;
-    artistas.forEach(a => {
-        html += `<button class="btn-ghost p-1 px-3 rounded mr-2 ${currentArtistFilter === a ? 'bg-green-500 text-black' : ''}" onclick="filterArtist('${esc(a)}')">${esc(a)}</button>`;
+    const artistas = [];
+    library.forEach(function(x) { if(artistas.indexOf(x.artist) === -1) artistas.push(x.artist); });
+    artistas.sort();
+    let html = '<button onclick="filterArtist(null)" style="padding:5px 10px; margin-right:5px; border-radius:5px; border:none; background:' + (!currentArtistFilter ? '#22c55e' : '#1e293b') + '">Todos</button>';
+    artistas.forEach(function(a) {
+        html += '<button onclick="filterArtist(\''+esc(a)+'\')" style="padding:5px 10px; margin-right:5px; border-radius:5px; border:none; white-space:nowrap; background:' + (currentArtistFilter === a ? '#22c55e' : '#1e293b') + '">' + esc(a) + '</button>';
     });
     tabs.innerHTML = html;
 }
 
+// --- FUNÇÕES DE PLAYER ---
+function viewSingleSong(id) {
+    const m = library.find(function(x) { return x.id == id; });
+    currentShowSongs = [m]; playIndex = 0; transpose = 0;
+    openPlayer();
+}
+
+function openPlayer() {
+    document.getElementById('show-play-screen').classList.add('active');
+    renderPlay();
+}
+
+function renderPlay() {
+    const s = currentShowSongs[playIndex];
+    document.getElementById('play-title').textContent = s.title;
+    document.getElementById('play-meta').textContent = s.artist + " • Tom: " + (s.key || 'N/A');
+    document.getElementById('transpose-val').textContent = transpose;
+    renderSongContent(document.getElementById('play-lyrics'), s.cifra, s.columns || 1, s.fontSize || 18, transpose);
+}
+
+function backToMenu() {
+    if(scrollInterval) toggleScroll();
+    document.getElementById('show-play-screen').classList.remove('active');
+}
+
+// --- LOGICA GERAL ---
 function saveToLibrary() {
     const song = {
         id: Date.now(),
@@ -287,102 +365,95 @@ function saveToLibrary() {
         fontSize: edFontSize,
         columns: edColumns
     };
-    if(!song.title || !song.cifra) return alert("Preencha Título e Cifra");
-    const idx = library.findIndex(x => x.title === song.title && x.artist === song.artist);
-    if(idx >= 0) library[idx] = song; else library.push(song);
+    if(!song.title || !song.cifra) return alert("Título e Cifra obrigatórios");
+    library.push(song);
     localStorage.setItem('biblio', JSON.stringify(library));
     alert("Salvo!");
     setTab('musicas');
 }
 
+function createShow() {
+    const n = prompt("Nome do Show:");
+    if(!n) return;
+    shows.push({ id: Date.now(), name: n, songs: [] });
+    localStorage.setItem('shows', JSON.stringify(shows));
+    renderShows();
+}
+
 function renderShows() {
     const div = document.getElementById('shows-list');
-    div.innerHTML = shows.map(s => `
-        <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 mb-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-bold text-green-400">${esc(s.name)}</h2>
-                    <p class="text-xs text-slate-500 font-bold">${s.songs.length} músicas</p>
-                </div>
-                <div class="flex">
-                    <button class="btn-primary p-2 px-4 rounded" onclick="playShow(${s.id})">▶ TOCAR</button>
-                    <button class="ml-4 text-red-500" onclick="deleteShow(${s.id})">🗑</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    div.innerHTML = shows.map(function(s) {
+        return '<div class="song-card">' +
+            '<div><div style="font-weight:bold; color:#22c55e;">'+esc(s.name)+'</div><div style="font-size:12px;">'+s.songs.length+' músicas</div></div>' +
+            '<button class="btn-base btn-blue" onclick="playShow('+s.id+')">▶ TOCAR</button>' +
+        '</div>';
+    }).join('');
+}
+
+function playShow(id) {
+    const s = shows.find(function(x) { return x.id == id; });
+    if(s.songs.length === 0) return alert("Show sem músicas");
+    currentShowSongs = s.songs; playIndex = 0; transpose = 0;
+    openPlayer();
 }
 
 function openAddToShow(songId) {
-    const s = library.find(x => x.id === songId);
     const list = document.getElementById('modal-shows-list');
-    list.innerHTML = shows.map(sh => `
-        <button class="p-3 bg-slate-800 rounded mb-2 text-left" onclick="addToShow(${sh.id}, ${s.id})">${esc(sh.name)}</button>
-    `).join('');
+    list.innerHTML = shows.map(function(sh) {
+        return '<button class="btn-base btn-outline" style="width:100%; margin-bottom:10px;" onclick="addToShow('+sh.id+','+songId+')">'+esc(sh.name)+'</button>';
+    }).join('');
     document.getElementById('modal-add').style.display = 'flex';
 }
 
 function addToShow(showId, songId) {
-    const sh = shows.find(x => x.id === showId);
-    const sg = library.find(x => x.id === songId);
-    sh.songs.push({...sg});
+    const sh = shows.find(function(x) { return x.id == showId; });
+    const sg = library.find(function(x) { return x.id == songId; });
+    sh.songs.push(JSON.parse(JSON.stringify(sg)));
     localStorage.setItem('shows', JSON.stringify(shows));
     closeModal();
     alert("Adicionado!");
 }
 
+function toggleScroll() {
+    const btn = document.getElementById('btn-scroll');
+    const container = document.getElementById('play-lyrics');
+    if (scrollInterval) {
+        clearInterval(scrollInterval);
+        scrollInterval = null;
+        btn.textContent = '▶';
+    } else {
+        btn.textContent = '⏸';
+        scrollInterval = setInterval(function() { container.scrollTop += 1; }, 50);
+    }
+}
+
 function exportarMasterApp() {
     let html = document.documentElement.outerHTML;
-    const dataInjection = `let library = ${JSON.stringify(library)}; let shows = ${JSON.stringify(shows)};`;
-    const regex = /let library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\];\s+let shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
+    const dataInjection = 'let library = ' + JSON.stringify(library) + '; let shows = ' + JSON.stringify(shows) + ';';
+    const regex = /let library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\]; let shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
     html = html.replace(regex, dataInjection);
     const blob = new Blob([html], { type: 'text/html' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'TATU_PRO_IPAD.html';
+    a.download = 'TATU_IPAD_OFFLINE.html';
     a.click();
 }
 
-// Helpers
-function setEdCols(v) { edColumns = v; updateEditorPreview(); }
-function changeEdFont(v) { edFontSize += v; updateEditorPreview(); }
-function updateEditorPreview() { renderSongContent(document.getElementById('editor-preview'), document.getElementById('ed-cifra').value, edColumns, edFontSize, 0); }
-function filterArtist(art) { currentArtistFilter = art; renderBiblioteca(); }
-function searchSongs() { searchTerm = document.getElementById('search-input').value.toLowerCase(); renderBiblioteca(); }
+// Auxiliares
 function closeModal() { document.getElementById('modal-add').style.display = 'none'; }
-function backToMenu() { if(scrollInterval) toggleScroll(); document.getElementById('show-play-screen').classList.add('hidden'); }
+function searchSongs() { searchTerm = document.getElementById('search-input').value.toLowerCase(); renderBiblioteca(); }
+function filterArtist(a) { currentArtistFilter = a; renderBiblioteca(); }
+function setEdCols(v) { edColumns = v; updateEditorPreview(); }
+function updateEditorPreview() { renderSongContent(document.getElementById('editor-preview'), document.getElementById('ed-cifra').value, edColumns, 14, 0); }
 function transposeUp() { transpose++; renderPlay(); }
 function transposeDown() { transpose--; renderPlay(); }
 function playPrev() { if(playIndex > 0) { playIndex--; renderPlay(); } }
 function playNext() { if(playIndex < currentShowSongs.length - 1) { playIndex++; renderPlay(); } }
-function toggleFullscreen() { document.getElementById('show-play-screen').classList.toggle('is-fullscreen'); }
-function viewSingleSong(id) { const m = library.find(x => x.id === id); currentShowSongs = [m]; playIndex = 0; transpose = 0; openPlayer(); }
-function openPlayer() { document.getElementById('show-play-screen').classList.remove('hidden'); renderPlay(); }
-function playShow(id) { const s = shows.find(x => x.id === id); if(!s.songs.length) return; currentShowSongs = s.songs; playIndex = 0; transpose = 0; openPlayer(); }
-function renderPlay() {
-    const s = currentShowSongs[playIndex];
-    document.getElementById('play-title').textContent = s.title;
-    document.getElementById('play-meta').textContent = `${s.artist} • Tom: ${s.key ? transposeChord(s.key, transpose) : 'N/A'}`;
-    document.getElementById('play-preset').textContent = s.preset || '';
-    document.getElementById('transpose-val').textContent = transpose;
-    renderSongContent(document.getElementById('play-lyrics'), s.cifra, s.columns || 1, s.fontSize || 14, transpose);
-}
-function editMusic(id) {
-    const m = library.find(x => x.id === id);
-    document.getElementById('ed-title').value = m.title;
-    document.getElementById('ed-artist').value = m.artist;
-    document.getElementById('ed-key').value = m.key;
-    document.getElementById('ed-preset').value = m.preset;
-    document.getElementById('ed-cifra').value = m.cifra;
-    edFontSize = m.fontSize || 14; edColumns = m.columns || 1; setTab('editor');
-}
-function createShow() { const n = prompt("Nome do Show:"); if(n) { shows.push({ id: Date.now(), name: n, songs: [] }); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
-function deleteMusic(id) { if(confirm("Excluir?")) { library = library.filter(x => x.id !== id); localStorage.setItem('biblio', JSON.stringify(library)); renderBiblioteca(); } }
-function deleteShow(id) { if(confirm("Excluir?")) { shows = shows.filter(x => x.id !== id); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
-function clearEditor() { document.querySelectorAll('#tab-editor input, #tab-editor textarea').forEach(i => i.value = ''); updateEditorPreview(); }
-function esc(t) { return t ? t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
+function deleteMusic(id) { if(confirm("Excluir?")) { library = library.filter(function(x){return x.id!=id}); localStorage.setItem('biblio', JSON.stringify(library)); renderBiblioteca(); } }
+function esc(t) { return t ? t.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
 
-setTab('musicas');
+// Iniciar
+renderBiblioteca();
 </script>
 </body>
 </html>
