@@ -35,6 +35,23 @@
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
+    
+<!-- CSS com fallback -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/daisyui@1.14.0/dist/full.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- CSS DE EMERGÊNCIA PARA IOS ANTIGO -->
+<style>
+    /* FALLBACK PARA QUANDO O TAILWIND NÃO FUNCIONAR */
+    .bg-slate-900 { background-color: #0f172a; }
+    .text-green-400 { color: #4ade80; }
+    .p-4 { padding: 1rem; }
+    .m-4 { margin: 1rem; }
+    .flex { display: flex; }
+    .grid { display: grid; }
+    /* Adicione mais fallbacks conforme necessário */
+</style>
 </head>
 <body>
 
