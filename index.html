@@ -2,7 +2,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- ESSENCIAIS PARA O IPAD RECONHECER COMO APP (SOMA A BARRA DE ENDEREÇO) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Tatu Chords">
@@ -10,7 +9,7 @@
     <title>TATU MASTER PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #020617; color: #f1f5f9; margin: 0; }
+        body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #020617; color: #f1f5f9; margin: 0; overflow-y: auto; }
         .tab-content { display: none !important; }
         .tab-content.active { display: block !important; }
         
@@ -26,44 +25,78 @@
         .input-ui { background: #000; border: 1px solid #334155; color: #fff; padding: 12px; width: 100%; border-radius: 8px; margin-bottom: 8px; box-sizing: border-box; }
         .card-song { background: #0f172a; border: 1px solid #1e293b; padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* PLAYER E FULLSCREEN FIX */
-        #show-play-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 9999; display: none; flex-direction: column; }
+        #show-play-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
         #show-play-screen.active { display: flex !important; }
-        
         #show-play-screen.full-mode .player-bar { display: none !important; }
-        #show-play-screen.full-mode #play-lyrics { padding-top: 40px !important; }
 
-        .player-bar { background: #0f172a; padding: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
+        .player-bar { height: 70px; background: #0f172a; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; flex-shrink: 0; }
         
-        /* PREVIEW IPAD SIMULATOR */
-        .ipad-frame { width: 768px !important; height: 960px !important; margin: 0 auto; border: 4px solid #334155 !important; position: relative; overflow-y: auto !important; background: #000; }
-        .ipad-label { display: none; text-align: center; font-size: 10px; color: #facc15; margin-bottom: 5px; }
+    .lyrics-render-area {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    /* Importante para não bugar o scroll no player */
+    column-gap: 40px; 
+}.verse-block {
+    margin-bottom: 1.5rem;
+    /* Impede que uma estrofe seja cortada ao meio entre duas colunas */
+    break-inside: avoid-column;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+}
+/* Garante que o container de preview no modo editor não suma */
+#editor-preview {
+    min-height: 200px;
+}
+
+/* Quando estiver no modo iPad, forçamos a altura do iPad Air 1 */
+.ipad-frame .lyrics-render-area {
+    height: 880px !important; /* Altura útil interna do iPad */
+}
+#play-lyrics {
+    flex: 1;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 30px 40px;                  /* mesma margem do preview */
+}
+
+       .ipad-frame {
+    width: 768px !important;
+    height: 1024px !important;
+    margin: 20px auto;
+    border: 8px solid #334155;
+    border-radius: 20px;
+    position: relative;
+    background: #000;
+    display: flex !important;
+    flex-direction: column;
+    overflow: hidden !important;
+}
+        .ipad-label { display: none; text-align: center; font-size: 12px; color: #facc15; margin-top: 10px; font-weight: bold; }
         .ipad-mode-on .ipad-label { display: block; }
 
-        /* Estilos da Cifra */
-        .chord { color: #4ade80; font-weight: bold; font-family: 'Courier New', monospace; font-size: inherit; line-height: inherit; white-space: pre; }
-        .lyric-line { color: #fff; margin-bottom: 2px; font-size: inherit; line-height: inherit; }
-        .verse-block { margin-bottom: 1.5rem; break-inside: avoid; -webkit-column-break-inside: avoid; }
+      .chord {
+    color: #4ade80;
+    white-space: pre-wrap;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1em;          /* um pouco maior que a letra ajuda na legibilidade */
+    letter-spacing: 0.5px;     /* compensa kerning ruim no Safari antigo */
+}
+.lyric-line {
+    font-size: 1em;
+    white-space: pre-wrap; /* ESSENCIAL */
+}
+        .verse-block { margin-bottom: 1.5rem; break-inside: avoid-column; -webkit-column-break-inside: avoid; }
         
-        /* PRESET NEON STYLE */
         .preset-badge { 
-            background: #ef4444; 
-            color: #fff; 
-            padding: 2px 10px; 
-            border-radius: 4px; 
-            font-weight: 800; 
-            font-size: 10px;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-            text-shadow: 0 0 5px #fff, 0 0 10px #fff; /* Neon effect */
-            border: 1px solid #fff;
-            margin-left: 8px;
-            display: inline-block;
-            vertical-align: middle;
+            background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 900; font-size: 11px;
+            text-transform: uppercase; box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff; border: 1px solid #fff; margin-left: 10px; display: inline-block;
         }
+        
 
         .note-box { color: #f87171; font-style: italic; border-left: 4px solid #f87171; padding: 5px 10px; margin: 10px 0; background: rgba(248, 113, 113, 0.1); font-size: 0.9em; }
-        
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; }
         .modal-content { background: #0f172a; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; border: 1px solid #334155; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -80,11 +113,10 @@
         <div class="nav-item" id="btn-tab-editor" onclick="setTab('editor')">Editor</div>
     </div>
 
-    <!-- ABAS -->
     <section id="tab-musicas" class="tab-content" style="padding: 10px;">
         <input type="text" id="search-input" placeholder="Buscar música..." class="input-ui" oninput="searchSongs()">
-        <div id="artist-tabs" style="display: flex; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px;"><button onclick="filterArtist(null)" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; background:#22c55e; color:#000; font-weight:bold;">Todos</button><button onclick="filterArtist('Pearl Jam')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Pearl Jam</button><button onclick="filterArtist('Radiohead')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Radiohead</button><button onclick="filterArtist('Skank')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Skank</button></div>
-        <div id="biblioteca-list"><div class="card-song"><div onclick="viewSingleSong(1773960747731)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Creep</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Radiohead</div></div><div style="display:flex;"><button onclick="openAddToShow(1773960747731)" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button><button onclick="editMusic(1773960747731)" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button><button onclick="deleteMusic(1773960747731)" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1773960789275)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Jack Tequila</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Skank</div></div><div style="display:flex;"><button onclick="openAddToShow(1773960789275)" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button><button onclick="editMusic(1773960789275)" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button><button onclick="deleteMusic(1773960789275)" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1773962117539)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Alive</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Pearl Jam</div></div><div style="display:flex;"><button onclick="openAddToShow(1773962117539)" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button><button onclick="editMusic(1773962117539)" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button><button onclick="deleteMusic(1773962117539)" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1773962684639)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Even Flow</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Pearl Jam</div></div><div style="display:flex;"><button onclick="openAddToShow(1773962684639)" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button><button onclick="editMusic(1773962684639)" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button><button onclick="deleteMusic(1773962684639)" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div></div>
+        <div id="artist-tabs" style="display: flex; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px;" class="no-scrollbar"><button onclick="filterArtist(null)" style="padding:6px 12px; margin-right:6px; border-radius:6px; background:#22c55e; color:#000; font-weight:bold;">Todos</button><button onclick="filterArtist('Barão Vermelho')" style="padding:6px 12px; margin-right:6px; border-radius:6px; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Barão Vermelho</button><button onclick="filterArtist('Chris Isaak')" style="padding:6px 12px; margin-right:6px; border-radius:6px; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Chris Isaak</button><button onclick="filterArtist('Pearl Jam')" style="padding:6px 12px; margin-right:6px; border-radius:6px; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Pearl Jam</button><button onclick="filterArtist('Radiohead')" style="padding:6px 12px; margin-right:6px; border-radius:6px; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Radiohead</button><button onclick="filterArtist('Skank')" style="padding:6px 12px; margin-right:6px; border-radius:6px; white-space:nowrap; background:#1e293b; color:#fff; font-weight:bold;">Skank</button></div>
+        <div id="biblioteca-list"><div class="card-song"><div onclick="viewSingleSong(1774194605828)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Creep</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Radiohead</div></div><div style="display:flex;"><button onclick="openAddToShow(1774194605828)" style="padding:8px; font-size:18px; color:#22c55e;">➕</button><button onclick="editMusic(1774194605828)" style="padding:8px; font-size:18px; color:#3b82f6;">✏️</button><button onclick="deleteMusic(1774194605828)" style="padding:8px; font-size:18px; color:#ef4444;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1773960789275)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Jack Tequila</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Skank</div></div><div style="display:flex;"><button onclick="openAddToShow(1773960789275)" style="padding:8px; font-size:18px; color:#22c55e;">➕</button><button onclick="editMusic(1773960789275)" style="padding:8px; font-size:18px; color:#3b82f6;">✏️</button><button onclick="deleteMusic(1773960789275)" style="padding:8px; font-size:18px; color:#ef4444;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1774193318868)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Alive</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Pearl Jam</div></div><div style="display:flex;"><button onclick="openAddToShow(1774193318868)" style="padding:8px; font-size:18px; color:#22c55e;">➕</button><button onclick="editMusic(1774193318868)" style="padding:8px; font-size:18px; color:#3b82f6;">✏️</button><button onclick="deleteMusic(1774193318868)" style="padding:8px; font-size:18px; color:#ef4444;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1773962684639)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Even Flow</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Pearl Jam</div></div><div style="display:flex;"><button onclick="openAddToShow(1773962684639)" style="padding:8px; font-size:18px; color:#22c55e;">➕</button><button onclick="editMusic(1773962684639)" style="padding:8px; font-size:18px; color:#3b82f6;">✏️</button><button onclick="deleteMusic(1773962684639)" style="padding:8px; font-size:18px; color:#ef4444;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1774196091072)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Meus Bons amigos </div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Barão Vermelho</div></div><div style="display:flex;"><button onclick="openAddToShow(1774196091072)" style="padding:8px; font-size:18px; color:#22c55e;">➕</button><button onclick="editMusic(1774196091072)" style="padding:8px; font-size:18px; color:#3b82f6;">✏️</button><button onclick="deleteMusic(1774196091072)" style="padding:8px; font-size:18px; color:#ef4444;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1774196989052)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Wicked Gane</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Chris Isaak</div></div><div style="display:flex;"><button onclick="openAddToShow(1774196989052)" style="padding:8px; font-size:18px; color:#22c55e;">➕</button><button onclick="editMusic(1774196989052)" style="padding:8px; font-size:18px; color:#3b82f6;">✏️</button><button onclick="deleteMusic(1774196989052)" style="padding:8px; font-size:18px; color:#ef4444;">🗑</button></div></div><div class="card-song"><div onclick="viewSingleSong(1774197461870)" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">Codinome Beija Flow</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">Barão Vermelho</div></div><div style="display:flex;"><button onclick="openAddToShow(1774197461870)" style="padding:8px; font-size:18px; color:#22c55e;">➕</button><button onclick="editMusic(1774197461870)" style="padding:8px; font-size:18px; color:#3b82f6;">✏️</button><button onclick="deleteMusic(1774197461870)" style="padding:8px; font-size:18px; color:#ef4444;">🗑</button></div></div></div>
     </section>
 
     <section id="tab-shows" class="tab-content active" style="padding: 10px;">
@@ -92,52 +124,75 @@
             <button class="btn-ui btn-blue" style="flex: 2; margin-right: 8px;" onclick="createShow()">➕ Novo Show</button>
             <button class="btn-ui btn-ghost" onclick="exportarMasterApp()">EXPORTAR PARA IPAD</button>
         </div>
-        <div id="shows-list"></div>
+        <div id="shows-list"><div class="card-song" style="flex-direction:column; align-items:stretch;"><div style="display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:bold; color:#22c55e; font-size:18px;">Pacto</div><div style="font-size:11px; font-weight:bold;">7 MÚSICAS</div></div><div><button class="btn-ui btn-blue" onclick="playShow(1774196164584)">TOCAR</button><button onclick="deleteShow(1774196164584)" style="margin-left:10px; color:#ef4444; font-size:18px;">🗑</button></div></div><div style="margin-top:10px;"><div style="display:flex; align-items:center; justify-content:space-between; padding:6px; border-bottom:1px solid #1e293b;"><div style="flex:1;">1. Meus Bons amigos </div><div style="display:flex; align-items:center; gap:6px;"><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,0,-1)">⬆</button><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,0,1)">⬇</button><button class="btn-ui btn-ghost" style="padding:6px 10px; color:#ef4444;" onclick="removeFromShow(0,0)">✖</button></div></div><div style="display:flex; align-items:center; justify-content:space-between; padding:6px; border-bottom:1px solid #1e293b;"><div style="flex:1;">2. Creep</div><div style="display:flex; align-items:center; gap:6px;"><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,1,-1)">⬆</button><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,1,1)">⬇</button><button class="btn-ui btn-ghost" style="padding:6px 10px; color:#ef4444;" onclick="removeFromShow(0,1)">✖</button></div></div><div style="display:flex; align-items:center; justify-content:space-between; padding:6px; border-bottom:1px solid #1e293b;"><div style="flex:1;">3. Jack Tequila</div><div style="display:flex; align-items:center; gap:6px;"><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,2,-1)">⬆</button><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,2,1)">⬇</button><button class="btn-ui btn-ghost" style="padding:6px 10px; color:#ef4444;" onclick="removeFromShow(0,2)">✖</button></div></div><div style="display:flex; align-items:center; justify-content:space-between; padding:6px; border-bottom:1px solid #1e293b;"><div style="flex:1;">4. Alive</div><div style="display:flex; align-items:center; gap:6px;"><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,3,-1)">⬆</button><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,3,1)">⬇</button><button class="btn-ui btn-ghost" style="padding:6px 10px; color:#ef4444;" onclick="removeFromShow(0,3)">✖</button></div></div><div style="display:flex; align-items:center; justify-content:space-between; padding:6px; border-bottom:1px solid #1e293b;"><div style="flex:1;">5. Even Flow</div><div style="display:flex; align-items:center; gap:6px;"><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,4,-1)">⬆</button><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,4,1)">⬇</button><button class="btn-ui btn-ghost" style="padding:6px 10px; color:#ef4444;" onclick="removeFromShow(0,4)">✖</button></div></div><div style="display:flex; align-items:center; justify-content:space-between; padding:6px; border-bottom:1px solid #1e293b;"><div style="flex:1;">6. Wicked Gane</div><div style="display:flex; align-items:center; gap:6px;"><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,5,-1)">⬆</button><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,5,1)">⬇</button><button class="btn-ui btn-ghost" style="padding:6px 10px; color:#ef4444;" onclick="removeFromShow(0,5)">✖</button></div></div><div style="display:flex; align-items:center; justify-content:space-between; padding:6px; border-bottom:1px solid #1e293b;"><div style="flex:1;">7. Codinome Beija Flow</div><div style="display:flex; align-items:center; gap:6px;"><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,6,-1)">⬆</button><button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong(0,6,1)">⬇</button><button class="btn-ui btn-ghost" style="padding:6px 10px; color:#ef4444;" onclick="removeFromShow(0,6)">✖</button></div></div></div></div></div>
     </section>
 
-    <section id="tab-editor" class="tab-content" style="padding: 10px;">
+  <section id="tab-editor" class="tab-content" style="padding: 10px;">
         <div style="background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid #1e293b;">
-            <div style="display: flex; margin-bottom: 8px;"><input id="ed-title" placeholder="Título" class="input-ui" style="margin-right: 5px;"><input id="ed-artist" placeholder="Artista" class="input-ui"></div>
+            
+            <!-- Título e Artista -->
+            <div style="display: flex; margin-bottom: 8px;">
+                <input id="ed-title" placeholder="Título" class="input-ui" style="margin-right: 5px;">
+                <input id="ed-artist" placeholder="Artista" class="input-ui">
+            </div>
+
+            <!-- Tom e Preset -->
             <div style="display: flex; margin-bottom: 8px;">
                 <input id="ed-key" placeholder="Tom" class="input-ui" style="margin-right: 5px; color: #4ade80;">
                 <input id="ed-preset" placeholder="Preset POD HD" class="input-ui" style="color: #ef4444; font-weight: bold;">
             </div>
-            <textarea id="ed-cifra" oninput="updateEditorPreview()" placeholder="Cifra aqui..." class="input-ui" style="height: 180px; font-family: monospace;"></textarea>
+
+            <!-- CAMPO DE CIFRA AMPLIADO (500px) -->
+            <textarea id="ed-cifra" oninput="updateEditorPreview()" placeholder="Cole ou digite a cifra aqui..." class="input-ui no-scrollbar" style="height: 500px; font-family: 'Courier New', Courier, monospace; font-size: 16px; line-height: 1.2; border: 1px solid #334155; margin-bottom: 15px; resize: vertical;">            </textarea>
             
-            <div style="background: #000; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+            <!-- Painel de Controles -->
+            <div style="background: #000; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #1e293b;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <div style="display: flex;"><button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="changeEdFont(-2)">A-</button><button class="btn-ui btn-ghost" onclick="changeEdFont(2)">A+</button></div>
+                    <div style="display: flex;">
+                        <button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="changeEdFont(-1)">A-</button>
+                        <button class="btn-ui btn-ghost" onclick="changeEdFont(1)">A+</button>
+                    </div>
+
                     <button id="btn-ipad-toggle" class="btn-ui btn-ghost text-yellow-400" onclick="toggleIpadView()">📱 SIMULAR IPAD</button>
-                    <div style="display: flex;"><button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="changeEdSpacing(-0.1)">S-</button><button class="btn-ui btn-ghost" onclick="changeEdSpacing(0.1)">S+</button></div>
+                    
+                    <div style="display: flex;">
+                        <button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="changeEdSpacing(-0.1)">S-</button>
+                        <button class="btn-ui btn-ghost" onclick="changeEdSpacing(0.1)">S+</button>
+                    </div>
                 </div>
-                <div style="display: flex; justify-content: center; border-top: 1px solid #1e293b; padding-top: 8px;">
-                    <button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="setEdCols(1)">1 Col</button>
-                    <button class="btn-ui btn-ghost" style="margin-right: 4px;" onclick="setEdCols(2)">2 Col</button>
+                
+                <div style="display: flex; justify-content: center; border-top: 1px solid #1e293b; padding-top: 8px; gap: 8px;">
+                    <button class="btn-ui btn-ghost" onclick="setEdCols(1)">1 Col</button>
+                    <button class="btn-ui btn-ghost" onclick="setEdCols(2)">2 Col</button>
                     <button class="btn-ui btn-ghost" onclick="setEdCols(3)">3 Col</button>
                 </div>
             </div>
 
-            <div class="ipad-label">Visualização Real: iPad Air (768px)</div>
-            <div id="editor-preview" style="background: rgb(0, 0, 0); padding: 15px; border-radius: 8px; min-height: 150px; margin-bottom: 15px; overflow: auto; column-count: 2; font-size: 16px; line-height: 1.3;"><div><div class="verse-block"><div class="lyric-line">[Intro]  Em  D</div></div><div class="verse-block"><div class="chord">D   C      D                    C            D      C   </div><div class="lyric-line">Fre--ezin', rests his head on a pillow made of concrete,</div><div class="lyric-line">    (D  C)</div><div class="lyric-line"> again</div><div class="chord">    D   C    D              C                     D  C   D</div><div class="lyric-line">Oh, Fee--lin' maybe he'll see a little better set a days, </div><div class="chord">      C</div><div class="lyric-line">  ooh yeah</div><div class="chord">    D   C    D               C                         </div><div class="lyric-line">Oh, hand out, faces that he sees time again ain't that </div><div class="chord">D    C  D      C</div><div class="lyric-line">familiar,  ooh yeah</div><div class="chord">    D   C     D                  C                  </div><div class="lyric-line">Oh, dark grin, he can't help, when he's happy looks </div><div class="chord">D  C  D     C</div><div class="lyric-line">insane,  oh yeah</div></div><div class="verse-block"><div class="lyric-line">( D  C )</div></div><div class="verse-block"><div class="chord">D    Bb                         D     C</div><div class="lyric-line">Even flow, thoughts arrive like butterflies</div><div class="chord">    D        Bb                      D     C</div><div class="lyric-line">Oh, he don't know, so he chases them away, yeah...ooh</div><div class="chord">     D       Bb                   D   C        D    </div><div class="lyric-line">Oh, someday yet, he'll begin his life again    life </div><div class="chord">Am  C      D    Am  C</div><div class="lyric-line">a--gain   life a--gain</div></div><div class="verse-block"><div class="chord">D    C     D                                C           </div><div class="lyric-line">Kne--elin', looking through the paper through he doesn't</div><div class="chord">       D   C   D      C</div><div class="lyric-line"> know to read,   ooh yeah</div><div class="chord">    D   C     D                    C                    D </div><div class="lyric-line">Oh, pra--yin', now to something that has never showed him </div><div class="chord">     C</div><div class="lyric-line">anything</div><div class="chord">    D   C     D                         C                </div><div class="lyric-line">Oh, fee--lin', understands the weather of the winters on </div><div class="chord">  D  C  D  C</div><div class="lyric-line">its  way</div><div class="chord">    D   C      D                      C                  D</div><div class="lyric-line">Oh, cei--lings, few and far between all the legal halls of</div><div class="chord">  C  D   C</div><div class="lyric-line"> shame,  yeah</div></div><div class="verse-block"><div class="chord">D    Bb                         D     C</div><div class="lyric-line">Even flow, thoughts arrive like butterflies</div><div class="chord">    D        Bb                      D     C</div><div class="lyric-line">Oh, he don't know, so he chases them away, yeah...ooh</div><div class="chord">D       Bb                       D    C</div><div class="lyric-line">Oh, someday yet, he'll begin his life again</div><div class="chord">     D          Bb                              D  C   D  </div><div class="lyric-line">Oh, whispering hands, gently lead, lead him away...    him</div><div class="lyric-line"> Am  C    D   Am  C     (D  Am  G)</div><div class="lyric-line"> a--way, him a--way...        Yeah</div></div><div class="verse-block"><div class="lyric-line">[Solo]  D  C</div></div><div class="verse-block"><div class="chord">D    Bb                         D     C</div><div class="lyric-line">Even flow, thoughts arrive like butterflies</div><div class="chord">    D        Bb                      D     C</div><div class="lyric-line">Oh, he don't know, so he chases them away, yeah...ooh</div><div class="chord">D       Bb                       D    C</div><div class="lyric-line">Oh, someday yet, he'll begin his life again</div><div class="chord">     D          Bb                              D  C   D  </div><div class="lyric-line">Oh, whispering hands, gently lead, lead him away...    him</div><div class="lyric-line"> Am  C    D   Am  C     (D  Am  G)</div><div class="lyric-line"> a--way, him a--way...        Yeah</div></div></div></div>
-            <div style="display: flex;"><button class="btn-ui btn-green" style="flex: 1; margin-right: 8px;" onclick="saveToLibrary()">💾 Salvar</button><button class="btn-ui btn-ghost" onclick="clearEditor()">Limpar</button></div>
+            <div class="ipad-label">PREVIEW FIEL (IPAD AIR)</div>
+            <div id="editor-preview-wrapper" style="background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #1e293b;">
+                <div id="editor-preview" style="padding: 15px; min-height: 200px; height: auto; display: block; font-size: 18px; line-height: 0.8; column-count: 1;"><div><div class="verse-block"><div class="chord">B       B7M      B        B7M</div><div class="lyric-line">Pra que mentir, fingir que perdoou</div></div><div class="verse-block"><div class="chord">E7M          F#/E       G#m7</div><div class="lyric-line">Tentar ficar amigos sem rancor</div></div><div class="verse-block"><div class="chord">E7M      F#/E       E7M              F#/E</div><div class="lyric-line">A emoção acabou, que coincidência é o amor</div></div><div class="verse-block"><div class="chord">C#m7   D#m7   E7M   E/F#    G7M</div><div class="lyric-line">A nossa música nunca mais tocou</div></div><div class="verse-block"><div class="chord">B       B7M     B        B7M</div><div class="lyric-line">Pra que usar de tanta educação</div></div><div class="verse-block"><div class="chord">E7M         F#/E        G#m7</div><div class="lyric-line">Pra destilar terceiras intenções</div></div><div class="verse-block"><div class="chord">E7M              F#/E     E7M               F#/E</div><div class="lyric-line">Desperdiçando o meu mel, devagarzinho flor em flor</div></div><div class="verse-block"><div class="chord">C#m7      D#m7    E7M     E/F#   G   G/A</div><div class="lyric-line">Entre os meus inimigos, Beija-Flor</div></div><div class="verse-block"><div class="chord">D7M                 C#m7 F#7   G7M         A7       B7M</div><div class="lyric-line">Eu protegi seu nome por amor,   em um codinome Beija-Flor</div></div><div class="verse-block"><div class="chord">D7M       C#m7 F#7   G7M             A   B7M</div><div class="lyric-line">Não responda nunca meu amor,  nunca pra qualquer um na rua Beija-Flor</div></div><div class="verse-block"><div class="chord">G7M            A     G7M                   A</div><div class="lyric-line">Que só eu que podia, dentro da tua orelha fria</div></div><div class="verse-block"><div class="chord">G7M               A          B7    G7M          A</div><div class="lyric-line">Dizer segredos de liquidificador, voce sonhava acordada</div></div><div class="verse-block"><div class="chord">G7M               A      G7M           A          B7M</div><div class="lyric-line">Um jeito de não sentir dor, prendia o choro e aguava o bom do amor</div></div><div class="verse-block"><div class="chord">G7M             A7M              B7M</div><div class="lyric-line">Prendia o choro e aguava o bom do amor</div></div></div></div>
+            </div>
+            
+            <!-- Botões de Ação Final -->
+            <div style="display: flex; margin-top: 15px; gap: 8px;">
+                <button class="btn-ui btn-green" style="flex: 2; font-size: 16px; height: 45px;" onclick="saveToLibrary()">💾 SALVAR NA BIBLIOTECA</button>
+                <button class="btn-ui btn-ghost" style="flex: 1;" onclick="clearEditor()">Limpar</button>
+            </div>
         </div>
     </section>
-</div>
-
-<!-- PLAYER -->
 <div id="show-play-screen" class="">
     <div class="player-bar">
         <div style="display: flex; align-items: center;">
             <button onclick="backToMenu()" style="background: none; border: none; color: #fff; font-size: 26px; margin-right: 15px;">✕</button>
             <div>
-                <div id="play-title" style="font-weight: bold; color: #4ade80;">Even Flow</div>
-                <div id="play-meta" style="font-size: 11px; color: #94a3b8; display: flex; align-items: center;">Pearl Jam • Tom: E <span class="preset-badge">1C:Heavy Drive</span></div>
+                <div id="play-title" style="font-weight: bold; color: #4ade80;">Codinome Beija Flow</div>
+                <div id="play-meta" style="font-size: 11px; color: #94a3b8; display: flex; align-items: center;">Barão Vermelho • Tom: B <span class="preset-badge">Clean Crunch</span></div>
             </div>
         </div>
         <div style="display: flex; align-items: center;"><button class="btn-ui btn-ghost" onclick="transposeDown()">-</button><span id="transpose-val" style="margin: 0 12px; font-weight: bold; color: #4ade80;">0</span><button class="btn-ui btn-ghost" onclick="transposeUp()">+</button></div>
     </div>
     
-    <div id="play-lyrics" style="flex: 1 1 0%; overflow-y: auto; padding: 25px; column-count: 2; font-size: 16px; line-height: 1.3;" class="no-scrollbar" onclick="toggleFullscreen()"><div><div class="verse-block"><div class="lyric-line">[Intro]  Em  D</div></div><div class="verse-block"><div class="chord">D   C      D                    C            D      C   </div><div class="lyric-line">Fre--ezin', rests his head on a pillow made of concrete,</div><div class="lyric-line">    (D  C)</div><div class="lyric-line"> again</div><div class="chord">    D   C    D              C                     D  C   D</div><div class="lyric-line">Oh, Fee--lin' maybe he'll see a little better set a days, </div><div class="chord">      C</div><div class="lyric-line">  ooh yeah</div><div class="chord">    D   C    D               C                         </div><div class="lyric-line">Oh, hand out, faces that he sees time again ain't that </div><div class="chord">D    C  D      C</div><div class="lyric-line">familiar,  ooh yeah</div><div class="chord">    D   C     D                  C                  </div><div class="lyric-line">Oh, dark grin, he can't help, when he's happy looks </div><div class="chord">D  C  D     C</div><div class="lyric-line">insane,  oh yeah</div></div><div class="verse-block"><div class="lyric-line">( D  C )</div></div><div class="verse-block"><div class="chord">D    Bb                         D     C</div><div class="lyric-line">Even flow, thoughts arrive like butterflies</div><div class="chord">    D        Bb                      D     C</div><div class="lyric-line">Oh, he don't know, so he chases them away, yeah...ooh</div><div class="chord">     D       Bb                   D   C        D    </div><div class="lyric-line">Oh, someday yet, he'll begin his life again    life </div><div class="chord">Am  C      D    Am  C</div><div class="lyric-line">a--gain   life a--gain</div></div><div class="verse-block"><div class="chord">D    C     D                                C           </div><div class="lyric-line">Kne--elin', looking through the paper through he doesn't</div><div class="chord">       D   C   D      C</div><div class="lyric-line"> know to read,   ooh yeah</div><div class="chord">    D   C     D                    C                    D </div><div class="lyric-line">Oh, pra--yin', now to something that has never showed him </div><div class="chord">     C</div><div class="lyric-line">anything</div><div class="chord">    D   C     D                         C                </div><div class="lyric-line">Oh, fee--lin', understands the weather of the winters on </div><div class="chord">  D  C  D  C</div><div class="lyric-line">its  way</div><div class="chord">    D   C      D                      C                  D</div><div class="lyric-line">Oh, cei--lings, few and far between all the legal halls of</div><div class="chord">  C  D   C</div><div class="lyric-line"> shame,  yeah</div></div><div class="verse-block"><div class="chord">D    Bb                         D     C</div><div class="lyric-line">Even flow, thoughts arrive like butterflies</div><div class="chord">    D        Bb                      D     C</div><div class="lyric-line">Oh, he don't know, so he chases them away, yeah...ooh</div><div class="chord">D       Bb                       D    C</div><div class="lyric-line">Oh, someday yet, he'll begin his life again</div><div class="chord">     D          Bb                              D  C   D  </div><div class="lyric-line">Oh, whispering hands, gently lead, lead him away...    him</div><div class="lyric-line"> Am  C    D   Am  C     (D  Am  G)</div><div class="lyric-line"> a--way, him a--way...        Yeah</div></div><div class="verse-block"><div class="lyric-line">[Solo]  D  C</div></div><div class="verse-block"><div class="chord">D    Bb                         D     C</div><div class="lyric-line">Even flow, thoughts arrive like butterflies</div><div class="chord">    D        Bb                      D     C</div><div class="lyric-line">Oh, he don't know, so he chases them away, yeah...ooh</div><div class="chord">D       Bb                       D    C</div><div class="lyric-line">Oh, someday yet, he'll begin his life again</div><div class="chord">     D          Bb                              D  C   D  </div><div class="lyric-line">Oh, whispering hands, gently lead, lead him away...    him</div><div class="lyric-line"> Am  C    D   Am  C     (D  Am  G)</div><div class="lyric-line"> a--way, him a--way...        Yeah</div></div></div></div>
+    <div id="play-lyrics" class="no-scrollbar" onclick="toggleFullscreen()" style="padding: 25px; display: block; height: auto; font-size: 18px; line-height: 0.8; column-count: 1;"><div><div class="verse-block"><div class="chord">B       B7M      B        B7M</div><div class="lyric-line">Pra que mentir, fingir que perdoou</div></div><div class="verse-block"><div class="chord">E7M          F#/E       G#m7</div><div class="lyric-line">Tentar ficar amigos sem rancor</div></div><div class="verse-block"><div class="chord">E7M      F#/E       E7M              F#/E</div><div class="lyric-line">A emoção acabou, que coincidência é o amor</div></div><div class="verse-block"><div class="chord">C#m7   D#m7   E7M   E/F#    G7M</div><div class="lyric-line">A nossa música nunca mais tocou</div></div><div class="verse-block"><div class="chord">B       B7M     B        B7M</div><div class="lyric-line">Pra que usar de tanta educação</div></div><div class="verse-block"><div class="chord">E7M         F#/E        G#m7</div><div class="lyric-line">Pra destilar terceiras intenções</div></div><div class="verse-block"><div class="chord">E7M              F#/E     E7M               F#/E</div><div class="lyric-line">Desperdiçando o meu mel, devagarzinho flor em flor</div></div><div class="verse-block"><div class="chord">C#m7      D#m7    E7M     E/F#   G   G/A</div><div class="lyric-line">Entre os meus inimigos, Beija-Flor</div></div><div class="verse-block"><div class="chord">D7M                 C#m7 F#7   G7M         A7       B7M</div><div class="lyric-line">Eu protegi seu nome por amor,   em um codinome Beija-Flor</div></div><div class="verse-block"><div class="chord">D7M       C#m7 F#7   G7M             A   B7M</div><div class="lyric-line">Não responda nunca meu amor,  nunca pra qualquer um na rua Beija-Flor</div></div><div class="verse-block"><div class="chord">G7M            A     G7M                   A</div><div class="lyric-line">Que só eu que podia, dentro da tua orelha fria</div></div><div class="verse-block"><div class="chord">G7M               A          B7    G7M          A</div><div class="lyric-line">Dizer segredos de liquidificador, voce sonhava acordada</div></div><div class="verse-block"><div class="chord">G7M               A      G7M           A          B7M</div><div class="lyric-line">Um jeito de não sentir dor, prendia o choro e aguava o bom do amor</div></div><div class="verse-block"><div class="chord">G7M             A7M              B7M</div><div class="lyric-line">Prendia o choro e aguava o bom do amor</div></div></div></div>
     
     <div class="player-bar">
         <button class="btn-ui btn-ghost" onclick="playPrev()">Anterior</button>
@@ -146,13 +201,16 @@
     </div>
 </div>
 
-<div id="modal-add" class="modal-overlay"><div class="modal-content"><h3 style="margin-bottom: 15px; font-weight: bold; text-align: center; color: #22c55e;">Adicionar ao Show</h3><div id="modal-shows-list"></div><button class="btn-ui btn-ghost" style="width: 100%; margin-top: 15px;" onclick="closeModal()">Fechar</button></div></div>
+<div id="modal-add" class="modal-overlay" style="display: none;"><div class="modal-content"><h3 style="margin-bottom: 15px; font-weight: bold; text-align: center; color: #22c55e;">Adicionar ao Show</h3><div id="modal-shows-list"><button class="btn-ui btn-ghost" style="width:100%; margin-bottom:8px; text-align:left;" onclick="addToShow(1774196164584,1774197461870)">➕ Pacto</button></div><button class="btn-ui btn-ghost" style="width: 100%; margin-top: 15px;" onclick="closeModal()">Fechar</button></div></div>
 
 <script>
-var library = [{"id":1773960747731,"title":"Creep","artist":"Radiohead","key":"G","preset":"Creep","cifra":"![Intro] G  B  C  Cm\n\n                      G\nWhen you were here before\n                         B\nCouldn't look you in the eye\n                    C\nYou're just like an angel\n                     Cm\nYour skin makes me cry\n\n[Segunda Parte]\n\n                  G\nYou float like a feather\n                B\nIn a beautiful world\n               C\nI wish I was special\n                    Cm\nYou're so fucking special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n\n\n                    G\nI don't care if it hurts\n                  B\nI wanna have control\n                   C\nI wanna a perfect body\n                   Cm\nI wanna a perfect soul\n\n\n\n\n\n\n\n\n\n               G\nI want you to notice\n               B\nWhen I'm not around\n                    C\nYou're so fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n            Cm\nI don't belong here\n\n\n  G                        B\nShe's running out the door\n  C\nShe's running out\n     Cm                G  B\nShe run, run, run, run\n C  Cm\nRun\n\n\n                    G\nWhatever makes you happy\n              B\nWhatever you want\n             C\nSo fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n           G\nI don't belong here","fontSize":16,"columns":2,"lineHeight":1.1},{"id":1773960789275,"title":"Jack Tequila","artist":"Skank","key":"C","preset":"Clean","cifra":" C  F  C  F\n\nC     F\nFunk lá no morro da mangueira\n             C                  F\nEssa menina tá dizendo, sim eu sei\n C                     F\nNoite bamba, tudo à beça\n   C                     F\nBaião na rampa do cruzeiro\n             C                   F\nEssa menina tá dizendo don't worry\n                     C                 F\nCause everything is gonna be all right\n              C\nEverything, every tune\n                F\nWill be played by night\n    C        F\nOh yeh eh oh oh\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n C  F  C  F \n\n\n        C                F\nReggae lá na rádio do café\n            C                   F\nRapaziada que estiver afim vai lá\n        C            F\nEu vou ficar com Jackie oh\n   C                  F\nSe é que Jackie vai pra lá\n          C       F\nE se não for, já foi\n         C                 F\nO bonde do desejo segue rumo\n C                F\nCaixa, bumbo e sexo\n         C                   F\nSaudade na rampa do mundo oh oh\n\n![Refrão]\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n C\nJackie foi nascer\n        F\nNuma cabana em noa noa\n C               F\nSol do taiti na pele, now boa\n     C\nSeu pai cruzou o mar\n      F\nDuas filhas na canoa\n C                F\nCôco pra beber e leite de leoa\n C\nJackie é uma menina\n       F\nTão bonita que enjoa\n\n   C                 F\nEnjôo de vertigem, viagem de avião\n C                     F\nHálito de virgem, dois olhos de amêndoa \n  C             F\nVaca, cadela, macaca, gazela\n C           F\nLinda toda, toda linda ela\n C              F\nToda beleza se reconhece nela\n C              F\nJackie tequila coca-cola e água\nC              F\nÉgua, língua, mingua minha mágoa\n   C       F\nOh oh yeh\n\n\n","fontSize":17,"columns":2,"lineHeight":1},{"id":1773962117539,"title":"Alive","artist":"Pearl Jam","key":"E","preset":"Vox+DriveVoz","cifra":"![Intro] \nA5\n\nSon, she said\nHave I got a little story for you\nWhat you thought was your daddy\nWas nothin' but a\nWhile you were sittin'\nHome alone at age thirteen\nYour real daddy was dyin'\n                  F      C\nSorry you didn't see him\n          F         C\nBut I'm glad we talked\n\n![Refrão]\n\n   E5 G5  D5        A5\nOh I, oh, I'm still alive\n     E5 G5  D5        A5\nHey, I, oh, I'm still alive\n    E5 G5  D5          A5\nHey I, oh, I'm still alive\n      B5\nHey...oh\n\n\nOh, she walks slowly\nAcross a young man's room\nShe said I'm ready... for you\nI can't remember anything to this very day\n'Cept the look, the look\nF                C\nOh, you know where\n    F        C\nNow I can't see, I just stare\n\n![Refrão]\nE G D         A\n I, I'm still alive    \nE  G  D         A\nHey I, but, I'm still alive\n    E  G  D         A\nHey I, boy, I'm still alive\n    E G  D         A\nHey I, oh, I'm still alive, yeah\n\n![Ponte]\nB5  F#  B5  F#\nB5  F#  B5  F#\n\nA  A2  D5                       A   A2\n          Is something wrong, she said\n             A   A2     D5\nWell of course there is\n                      A   A2\nYou're still alive, she said\n                         B  B2  E5\nOh, and do I deserve to be\n                  B  B2\nIs that the question\n        B  B2       E5\nAnd if so,    if so\n         B5  B2\nWho answers,    who answers\n\n\nE5 G5  D5          A2\nI, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5               D5  A2\nHey I, hmm, I'm still alive,  yeah, yeah\n\n![Solo Final] \nE5  G5  D5  A5","fontSize":14,"columns":2,"lineHeight":1.5},{"id":1773962684639,"title":"Even Flow","artist":"Pearl Jam","key":"E","preset":"1C:Heavy Drive","cifra":"[Intro]  Em  D\n\nD   C      D                    C            D      C   \nFre--ezin', rests his head on a pillow made of concrete,\n    (D  C)\n again\n    D   C    D              C                     D  C   D\nOh, Fee--lin' maybe he'll see a little better set a days, \n      C\n  ooh yeah\n    D   C    D               C                         \nOh, hand out, faces that he sees time again ain't that \nD    C  D      C\nfamiliar,  ooh yeah\n    D   C     D                  C                  \nOh, dark grin, he can't help, when he's happy looks \nD  C  D     C\ninsane,  oh yeah\n\n( D  C )\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\n     D       Bb                   D   C        D    \nOh, someday yet, he'll begin his life again    life \nAm  C      D    Am  C\na--gain   life a--gain\n\nD    C     D                                C           \nKne--elin', looking through the paper through he doesn't\n       D   C   D      C\n know to read,   ooh yeah\n    D   C     D                    C                    D \nOh, pra--yin', now to something that has never showed him \n     C\nanything\n    D   C     D                         C                \nOh, fee--lin', understands the weather of the winters on \n  D  C  D  C\nits  way\n    D   C      D                      C                  D\nOh, cei--lings, few and far between all the legal halls of\n  C  D   C\n shame,  yeah\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\nD       Bb                       D    C\nOh, someday yet, he'll begin his life again\n     D          Bb                              D  C   D  \nOh, whispering hands, gently lead, lead him away...    him\n Am  C    D   Am  C     (D  Am  G)\n a--way, him a--way...        Yeah\n\n[Solo]  D  C\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\nD       Bb                       D    C\nOh, someday yet, he'll begin his life again\n     D          Bb                              D  C   D  \nOh, whispering hands, gently lead, lead him away...    him\n Am  C    D   Am  C     (D  Am  G)\n a--way, him a--way...        Yeah","fontSize":16,"columns":2,"lineHeight":1.3}]; var shows = [];
-
+// VARIAVEIS ES5 PARA COMPATIBILIDADE IPAD AIR 1
+var library = [{"id":1774194605828,"title":"Creep","artist":"Radiohead","key":"G","preset":"Creep","cifra":"![Intro] G  B  C  Cm\n\n                      G\nWhen you were here before\n                         B\nCouldn't look you in the eye\n                    C\nYou're just like an angel\n                     Cm\nYour skin makes me cry\n\n[Segunda Parte]\n\n                  G\nYou float like a feather\n                B\nIn a beautiful world\n               C\nI wish I was special\n                    Cm\nYou're so fucking special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n\n\n                    G\nI don't care if it hurts\n                  B\nI wanna have control\n                   C\nI wanna a perfect body\n                   Cm\nI wanna a perfect soul\n\n\n\n\n\n\n\n\n\n               G\nI want you to notice\n               B\nWhen I'm not around\n                    C\nYou're so fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n            Cm\nI don't belong here\n\n\n  G                        B\nShe's running out the door\n  C\nShe's running out\n     Cm                G  B\nShe run, run, run, run\n C  Cm\nRun\n\n\n                    G\nWhatever makes you happy\n              B\nWhatever you want\n             C\nSo fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n           G\nI don't belong here","fontSize":16,"columns":2,"lineHeight":1.1},{"id":1773960789275,"title":"Jack Tequila","artist":"Skank","key":"C","preset":"Clean","cifra":" C  F  C  F\n\nC     F\nFunk lá no morro da mangueira\n             C                  F\nEssa menina tá dizendo, sim eu sei\n C                     F\nNoite bamba, tudo à beça\n   C                     F\nBaião na rampa do cruzeiro\n             C                   F\nEssa menina tá dizendo don't worry\n                     C                 F\nCause everything is gonna be all right\n              C\nEverything, every tune\n                F\nWill be played by night\n    C        F\nOh yeh eh oh oh\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n C  F  C  F \n\n\n        C                F\nReggae lá na rádio do café\n            C                   F\nRapaziada que estiver afim vai lá\n        C            F\nEu vou ficar com Jackie oh\n   C                  F\nSe é que Jackie vai pra lá\n          C       F\nE se não for, já foi\n         C                 F\nO bonde do desejo segue rumo\n C                F\nCaixa, bumbo e sexo\n         C                   F\nSaudade na rampa do mundo oh oh\n\n![Refrão]\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n C\nJackie foi nascer\n        F\nNuma cabana em noa noa\n C               F\nSol do taiti na pele, now boa\n     C\nSeu pai cruzou o mar\n      F\nDuas filhas na canoa\n C                F\nCôco pra beber e leite de leoa\n C\nJackie é uma menina\n       F\nTão bonita que enjoa\n\n   C                 F\nEnjôo de vertigem, viagem de avião\n C                     F\nHálito de virgem, dois olhos de amêndoa \n  C             F\nVaca, cadela, macaca, gazela\n C           F\nLinda toda, toda linda ela\n C              F\nToda beleza se reconhece nela\n C              F\nJackie tequila coca-cola e água\nC              F\nÉgua, língua, mingua minha mágoa\n   C       F\nOh oh yeh\n\n\n","fontSize":17,"columns":2,"lineHeight":1},{"id":1774193318868,"title":"Alive","artist":"Pearl Jam","key":"E","preset":"Vox+DriveVoz","cifra":"![Intro] \nA5\n\nSon, she said\nHave I got a little story for you\nWhat you thought was your daddy\nWas nothin' but a\nWhile you were sittin'\nHome alone at age thirteen\nYour real daddy was dyin'\n                  F      C\nSorry you didn't see him\n          F         C\nBut I'm glad we talked\n\n![Refrão]\n\n   E5 G5  D5        A5\nOh I, oh, I'm still alive\n   E5 G5  D5        A5\nHey, I, oh, I'm still alive\n   E5 G5  D5        A5\nHey I, oh, I'm still alive\n      B5\nHey...oh\n\n\nOh, she walks slowly\nAcross a young man's room\nShe said I'm ready... for you\nI can't remember anything to this very day\n'Cept the look, the look\nF                C\nOh, you know where\n    F        C\nNow I can't see, I just stare\n\n![Refrão]\nE G D         A\n I, I'm still alive    \nE  G  D         A\nHey I, but, I'm still alive\n    E  G  D         A\nHey I, boy, I'm still alive\n    E G  D         A\nHey I, oh, I'm still alive, yeah\n\n![Ponte]\nB5  F#  B5  F#\nB5  F#  B5  F#\n\nA  A2  D5                       A   A2\n          Is something wrong, she said\n             A   A2     D5\nWell of course there is\n                      A   A2\nYou're still alive, she said\n                         B  B2  E5\nOh, and do I deserve to be\n                  B  B2\nIs that the question\n        B  B2       E5\nAnd if so,    if so\n         B5  B2\nWho answers,    who answers\n\n\nE5 G5  D5          A2\nI, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5               D5  A2\nHey I, hmm, I'm still alive,  yeah, yeah\n\n![Solo Final] \nE5  G5  D5  A5","fontSize":14,"columns":2,"lineHeight":1.5},{"id":1773962684639,"title":"Even Flow","artist":"Pearl Jam","key":"E","preset":"1C:Heavy Drive","cifra":"[Intro]  Em  D\n\nD   C      D                    C            D      C   \nFre--ezin', rests his head on a pillow made of concrete,\n    (D  C)\n again\n    D   C    D              C                     D  C   D\nOh, Fee--lin' maybe he'll see a little better set a days, \n      C\n  ooh yeah\n    D   C    D               C                         \nOh, hand out, faces that he sees time again ain't that \nD    C  D      C\nfamiliar,  ooh yeah\n    D   C     D                  C                  \nOh, dark grin, he can't help, when he's happy looks \nD  C  D     C\ninsane,  oh yeah\n\n( D  C )\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\n     D       Bb                   D   C        D    \nOh, someday yet, he'll begin his life again    life \nAm  C      D    Am  C\na--gain   life a--gain\n\nD    C     D                                C           \nKne--elin', looking through the paper through he doesn't\n       D   C   D      C\n know to read,   ooh yeah\n    D   C     D                    C                    D \nOh, pra--yin', now to something that has never showed him \n     C\nanything\n    D   C     D                         C                \nOh, fee--lin', understands the weather of the winters on \n  D  C  D  C\nits  way\n    D   C      D                      C                  D\nOh, cei--lings, few and far between all the legal halls of\n  C  D   C\n shame,  yeah\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\nD       Bb                       D    C\nOh, someday yet, he'll begin his life again\n     D          Bb                              D  C   D  \nOh, whispering hands, gently lead, lead him away...    him\n Am  C    D   Am  C     (D  Am  G)\n a--way, him a--way...        Yeah\n\n[Solo]  D  C\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\nD       Bb                       D    C\nOh, someday yet, he'll begin his life again\n     D          Bb                              D  C   D  \nOh, whispering hands, gently lead, lead him away...    him\n Am  C    D   Am  C     (D  Am  G)\n a--way, him a--way...        Yeah","fontSize":16,"columns":2,"lineHeight":1.3},{"id":1774196091072,"title":"Meus Bons amigos ","artist":"Barão Vermelho","key":"D","preset":"Crunch","cifra":"![Intro] \nD  F  G\nD  F  G\n\nD\nMeus bons amigos, onde estão\n   F                G\nNotícias de todos quero saber\n D\nCada um fez sua vida de forma diferente\n F                     G              D\nÀs vezes me pergunto: Malditos ou inocentes?\n\nD     F     G \n\n D\nNossos sonhos, realidades\n F                   G\nTodas as vertigens, crueldades\nD\nSobre nossos ombros aprendemos a carregar\n F               G\nToda a vontade que faz vingar\n     A G  F#m   G   A G\nNo bem que fez prá mim\n   F#m G  A G  F#m    G  A  G F#m G\nAssim, assim, me fez feliz, assim\n    D        G\nO amor sem fim\n      D        G\nNão esconde o medo\n     D      G    Bm  A   G\nDe ser completo e imperfeito\n\n![Solo] \nD  F  G\nD  F  G\n\n  D\nMeus bons amigos, onde estão\n    F               G\nNotícias de todos quero saber\n D\nSobre nossos ombros aprendemos a carregar\n F               G\nToda a vontade que faz vingar\n     A G  F#m   G   A G\nNo bem que fez prá mim\n   F#m  G  A G  F#m    G  A  G  F#m G\nAssim,  assim, me fez feliz, assim\n    D        G\nO amor sem fim\n      D        G\nNão esconde o medo\n     D      G     Bm   A  G\nDe ser completo e imperfeito\n    D        G\nO amor sem fim\n       D       G\nNão esconde o medo\n    D       G    Bm   A  G   \nDe ser completo e imperfeito\n D  F  G  D","fontSize":17,"columns":2,"lineHeight":0.9},{"id":1774196989052,"title":"Wicked Gane","artist":"Chris Isaak","key":"A","preset":"Clean ","cifra":"![Intro] \nBm  A  E\nBm  A  E\nThe world was on fire and no one could save me but you\nIt's strange what desire will make foolish people do\nI'd never dreamed that I'd meet somebody like you\nAnd I'd never dreamed that I'd lose somebody like you\n\nNo, I don't wanna fall in love\nNo, I don't wanna fall in love\nWith you\nWith you\n\nWhat a wicked game to play, to make me feel this way\nWhat a wicked thing to do, to let me dream of you\nWhat a wicked thing to say, you never felt this way\nWhat a wicked thing to do, to make me dream of you\n\nAnd I don't wanna fall in love\nNo, I don't wanna fall in love\nWith you\n\nWorld was on fire, no one could save me but you\nIt's strange what desire will make foolish people do\nI'd never dreamed that I'd love somebody like you\nAnd I'd never dreamed that I'd lose somebody like you\n\nNo, I don't wanna fall in love\nNo, I don't wanna fall in love\nWith you\nWith you\nNo, I...\n\nNobody loves no one","fontSize":18,"columns":2,"lineHeight":0.9},{"id":1774197461870,"title":"Codinome Beija Flow","artist":"Barão Vermelho","key":"B","preset":"Clean Crunch","cifra":"B       B7M      B        B7M\nPra que mentir, fingir que perdoou\n\n    E7M          F#/E       G#m7\nTentar ficar amigos sem rancor\n\n    E7M      F#/E       E7M              F#/E\nA emoção acabou, que coincidência é o amor\n\n   C#m7   D#m7   E7M   E/F#    G7M\nA nossa música nunca mais tocou\n\nB       B7M     B        B7M\nPra que usar de tanta educação\n\n     E7M         F#/E        G#m7\nPra destilar terceiras intenções\n\n   E7M              F#/E     E7M               F#/E\nDesperdiçando o meu mel, devagarzinho flor em flor\n\nC#m7      D#m7    E7M     E/F#   G   G/A\nEntre os meus inimigos, Beija-Flor\n\nD7M                 C#m7 F#7   G7M         A7       B7M\nEu protegi seu nome por amor,   em um codinome Beija-Flor\n\nD7M       C#m7 F#7   G7M             A   B7M\nNão responda nunca meu amor,  nunca pra qualquer um na rua Beija-Flor\n\nG7M            A     G7M                   A\nQue só eu que podia, dentro da tua orelha fria\n\nG7M               A          B7    G7M          A\nDizer segredos de liquidificador, voce sonhava acordada\n\nG7M               A      G7M           A          B7M\nUm jeito de não sentir dor, prendia o choro e aguava o bom do amor\n\n  G7M             A7M              B7M\nPrendia o choro e aguava o bom do amor","fontSize":18,"columns":1,"lineHeight":0.8}]; var shows = [{"id":1774196164584,"name":"Pacto","songs":[{"id":1774196091072,"title":"Meus Bons amigos ","artist":"Barão Vermelho","key":"D","preset":"Crunch","cifra":"![Intro] \nD  F  G\nD  F  G\n\nD\nMeus bons amigos, onde estão\n   F                G\nNotícias de todos quero saber\n D\nCada um fez sua vida de forma diferente\n F                     G              D\nÀs vezes me pergunto: Malditos ou inocentes?\n\nD     F     G \n\n D\nNossos sonhos, realidades\n F                   G\nTodas as vertigens, crueldades\nD\nSobre nossos ombros aprendemos a carregar\n F               G\nToda a vontade que faz vingar\n     A G  F#m   G   A G\nNo bem que fez prá mim\n   F#m G  A G  F#m    G  A  G F#m G\nAssim, assim, me fez feliz, assim\n    D        G\nO amor sem fim\n      D        G\nNão esconde o medo\n     D      G    Bm  A   G\nDe ser completo e imperfeito\n\n![Solo] \nD  F  G\nD  F  G\n\n  D\nMeus bons amigos, onde estão\n    F               G\nNotícias de todos quero saber\n D\nSobre nossos ombros aprendemos a carregar\n F               G\nToda a vontade que faz vingar\n     A G  F#m   G   A G\nNo bem que fez prá mim\n   F#m  G  A G  F#m    G  A  G  F#m G\nAssim,  assim, me fez feliz, assim\n    D        G\nO amor sem fim\n      D        G\nNão esconde o medo\n     D      G     Bm   A  G\nDe ser completo e imperfeito\n    D        G\nO amor sem fim\n       D       G\nNão esconde o medo\n    D       G    Bm   A  G   \nDe ser completo e imperfeito\n D  F  G  D","fontSize":17,"columns":2,"lineHeight":0.9},{"id":1774194605828,"title":"Creep","artist":"Radiohead","key":"G","preset":"Creep","cifra":"![Intro] G  B  C  Cm\n\n                      G\nWhen you were here before\n                         B\nCouldn't look you in the eye\n                    C\nYou're just like an angel\n                     Cm\nYour skin makes me cry\n\n[Segunda Parte]\n\n                  G\nYou float like a feather\n                B\nIn a beautiful world\n               C\nI wish I was special\n                    Cm\nYou're so fucking special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n\n\n                    G\nI don't care if it hurts\n                  B\nI wanna have control\n                   C\nI wanna a perfect body\n                   Cm\nI wanna a perfect soul\n\n\n\n\n\n\n\n\n\n               G\nI want you to notice\n               B\nWhen I'm not around\n                    C\nYou're so fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n            Cm\nI don't belong here\n\n\n  G                        B\nShe's running out the door\n  C\nShe's running out\n     Cm                G  B\nShe run, run, run, run\n C  Cm\nRun\n\n\n                    G\nWhatever makes you happy\n              B\nWhatever you want\n             C\nSo fucking special\n               Cm\nI wish I was special\n\n\n            G\nBut I'm a creep\n       B\nI'm a weirdo\n                          C\nWhat the hell am I doing here?\n           Cm\nI don't belong here\n           G\nI don't belong here","fontSize":16,"columns":2,"lineHeight":1.1},{"id":1773960789275,"title":"Jack Tequila","artist":"Skank","key":"C","preset":"Clean","cifra":" C  F  C  F\n\nC     F\nFunk lá no morro da mangueira\n             C                  F\nEssa menina tá dizendo, sim eu sei\n C                     F\nNoite bamba, tudo à beça\n   C                     F\nBaião na rampa do cruzeiro\n             C                   F\nEssa menina tá dizendo don't worry\n                     C                 F\nCause everything is gonna be all right\n              C\nEverything, every tune\n                F\nWill be played by night\n    C        F\nOh yeh eh oh oh\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n C  F  C  F \n\n\n        C                F\nReggae lá na rádio do café\n            C                   F\nRapaziada que estiver afim vai lá\n        C            F\nEu vou ficar com Jackie oh\n   C                  F\nSe é que Jackie vai pra lá\n          C       F\nE se não for, já foi\n         C                 F\nO bonde do desejo segue rumo\n C                F\nCaixa, bumbo e sexo\n         C                   F\nSaudade na rampa do mundo oh oh\n\n![Refrão]\n\n               C\nSeu nome é Jackie, Jackie oh oh\nF       C\n  Tequila\nF       C               F\n Oh Jaqueline Misty yeh oh\n      C  F\nTequila\n\n C\nJackie foi nascer\n        F\nNuma cabana em noa noa\n C               F\nSol do taiti na pele, now boa\n     C\nSeu pai cruzou o mar\n      F\nDuas filhas na canoa\n C                F\nCôco pra beber e leite de leoa\n C\nJackie é uma menina\n       F\nTão bonita que enjoa\n\n   C                 F\nEnjôo de vertigem, viagem de avião\n C                     F\nHálito de virgem, dois olhos de amêndoa \n  C             F\nVaca, cadela, macaca, gazela\n C           F\nLinda toda, toda linda ela\n C              F\nToda beleza se reconhece nela\n C              F\nJackie tequila coca-cola e água\nC              F\nÉgua, língua, mingua minha mágoa\n   C       F\nOh oh yeh\n\n\n","fontSize":17,"columns":2,"lineHeight":1},{"id":1774193318868,"title":"Alive","artist":"Pearl Jam","key":"E","preset":"Vox+DriveVoz","cifra":"![Intro] \nA5\n\nSon, she said\nHave I got a little story for you\nWhat you thought was your daddy\nWas nothin' but a\nWhile you were sittin'\nHome alone at age thirteen\nYour real daddy was dyin'\n                  F      C\nSorry you didn't see him\n          F         C\nBut I'm glad we talked\n\n![Refrão]\n\n   E5 G5  D5        A5\nOh I, oh, I'm still alive\n   E5 G5  D5        A5\nHey, I, oh, I'm still alive\n   E5 G5  D5        A5\nHey I, oh, I'm still alive\n      B5\nHey...oh\n\n\nOh, she walks slowly\nAcross a young man's room\nShe said I'm ready... for you\nI can't remember anything to this very day\n'Cept the look, the look\nF                C\nOh, you know where\n    F        C\nNow I can't see, I just stare\n\n![Refrão]\nE G D         A\n I, I'm still alive    \nE  G  D         A\nHey I, but, I'm still alive\n    E  G  D         A\nHey I, boy, I'm still alive\n    E G  D         A\nHey I, oh, I'm still alive, yeah\n\n![Ponte]\nB5  F#  B5  F#\nB5  F#  B5  F#\n\nA  A2  D5                       A   A2\n          Is something wrong, she said\n             A   A2     D5\nWell of course there is\n                      A   A2\nYou're still alive, she said\n                         B  B2  E5\nOh, and do I deserve to be\n                  B  B2\nIs that the question\n        B  B2       E5\nAnd if so,    if so\n         B5  B2\nWho answers,    who answers\n\n\nE5 G5  D5          A2\nI, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5  D5         A2\nHey I, oh, I'm still alive\n    E5 G5               D5  A2\nHey I, hmm, I'm still alive,  yeah, yeah\n\n![Solo Final] \nE5  G5  D5  A5","fontSize":14,"columns":2,"lineHeight":1.5},{"id":1773962684639,"title":"Even Flow","artist":"Pearl Jam","key":"E","preset":"1C:Heavy Drive","cifra":"[Intro]  Em  D\n\nD   C      D                    C            D      C   \nFre--ezin', rests his head on a pillow made of concrete,\n    (D  C)\n again\n    D   C    D              C                     D  C   D\nOh, Fee--lin' maybe he'll see a little better set a days, \n      C\n  ooh yeah\n    D   C    D               C                         \nOh, hand out, faces that he sees time again ain't that \nD    C  D      C\nfamiliar,  ooh yeah\n    D   C     D                  C                  \nOh, dark grin, he can't help, when he's happy looks \nD  C  D     C\ninsane,  oh yeah\n\n( D  C )\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\n     D       Bb                   D   C        D    \nOh, someday yet, he'll begin his life again    life \nAm  C      D    Am  C\na--gain   life a--gain\n\nD    C     D                                C           \nKne--elin', looking through the paper through he doesn't\n       D   C   D      C\n know to read,   ooh yeah\n    D   C     D                    C                    D \nOh, pra--yin', now to something that has never showed him \n     C\nanything\n    D   C     D                         C                \nOh, fee--lin', understands the weather of the winters on \n  D  C  D  C\nits  way\n    D   C      D                      C                  D\nOh, cei--lings, few and far between all the legal halls of\n  C  D   C\n shame,  yeah\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\nD       Bb                       D    C\nOh, someday yet, he'll begin his life again\n     D          Bb                              D  C   D  \nOh, whispering hands, gently lead, lead him away...    him\n Am  C    D   Am  C     (D  Am  G)\n a--way, him a--way...        Yeah\n\n[Solo]  D  C\n\nD    Bb                         D     C\nEven flow, thoughts arrive like butterflies\n    D        Bb                      D     C\nOh, he don't know, so he chases them away, yeah...ooh\nD       Bb                       D    C\nOh, someday yet, he'll begin his life again\n     D          Bb                              D  C   D  \nOh, whispering hands, gently lead, lead him away...    him\n Am  C    D   Am  C     (D  Am  G)\n a--way, him a--way...        Yeah","fontSize":16,"columns":2,"lineHeight":1.3},{"id":1774196989052,"title":"Wicked Gane","artist":"Chris Isaak","key":"A","preset":"Clean ","cifra":"![Intro] \nBm  A  E\nBm  A  E\nThe world was on fire and no one could save me but you\nIt's strange what desire will make foolish people do\nI'd never dreamed that I'd meet somebody like you\nAnd I'd never dreamed that I'd lose somebody like you\n\nNo, I don't wanna fall in love\nNo, I don't wanna fall in love\nWith you\nWith you\n\nWhat a wicked game to play, to make me feel this way\nWhat a wicked thing to do, to let me dream of you\nWhat a wicked thing to say, you never felt this way\nWhat a wicked thing to do, to make me dream of you\n\nAnd I don't wanna fall in love\nNo, I don't wanna fall in love\nWith you\n\nWorld was on fire, no one could save me but you\nIt's strange what desire will make foolish people do\nI'd never dreamed that I'd love somebody like you\nAnd I'd never dreamed that I'd lose somebody like you\n\nNo, I don't wanna fall in love\nNo, I don't wanna fall in love\nWith you\nWith you\nNo, I...\n\nNobody loves no one","fontSize":18,"columns":2,"lineHeight":0.9},{"id":1774197461870,"title":"Codinome Beija Flow","artist":"Barão Vermelho","key":"B","preset":"Clean Crunch","cifra":"B       B7M      B        B7M\nPra que mentir, fingir que perdoou\n\n    E7M          F#/E       G#m7\nTentar ficar amigos sem rancor\n\n    E7M      F#/E       E7M              F#/E\nA emoção acabou, que coincidência é o amor\n\n   C#m7   D#m7   E7M   E/F#    G7M\nA nossa música nunca mais tocou\n\nB       B7M     B        B7M\nPra que usar de tanta educação\n\n     E7M         F#/E        G#m7\nPra destilar terceiras intenções\n\n   E7M              F#/E     E7M               F#/E\nDesperdiçando o meu mel, devagarzinho flor em flor\n\nC#m7      D#m7    E7M     E/F#   G   G/A\nEntre os meus inimigos, Beija-Flor\n\nD7M                 C#m7 F#7   G7M         A7       B7M\nEu protegi seu nome por amor,   em um codinome Beija-Flor\n\nD7M       C#m7 F#7   G7M             A   B7M\nNão responda nunca meu amor,  nunca pra qualquer um na rua Beija-Flor\n\nG7M            A     G7M                   A\nQue só eu que podia, dentro da tua orelha fria\n\nG7M               A          B7    G7M          A\nDizer segredos de liquidificador, voce sonhava acordada\n\nG7M               A      G7M           A          B7M\nUm jeito de não sentir dor, prendia o choro e aguava o bom do amor\n\n  G7M             A7M              B7M\nPrendia o choro e aguava o bom do amor","fontSize":18,"columns":1,"lineHeight":0.8}]}];
 var currentShowSongs = null, playIndex = 0, transpose = 0, searchTerm = '', currentArtistFilter = null;
-var edFontSize = 18, edColumns = 1, edLineHeight = 1.3, scrollInterval = null, isIpadView = false;
+var edFontSize = 20;       // comece com 20px (muito usado em cifras no Air antigo)
+var edLineHeight = 1.45;   // 1.4–1.5 evita sobreposição
+var edColumns = 2;         // 2 colunas é o mais comum no Air 1 (3 fica apertado)
+var scrollInterval = null, isIpadView = false;
 var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
 function setTab(t) {
@@ -164,43 +222,111 @@ function setTab(t) {
 
 function toggleIpadView() {
     isIpadView = !isIpadView;
-    var preview = document.getElementById('editor-preview');
-    if(isIpadView) { preview.classList.add('ipad-frame'); document.body.classList.add('ipad-mode-on'); } 
-    else { preview.classList.remove('ipad-frame'); document.body.classList.remove('ipad-mode-on'); }
+    var preview = document.getElementById('editor-preview-wrapper');
+    if(isIpadView) { 
+        preview.className = 'ipad-frame'; 
+        document.body.classList.add('ipad-mode-on'); 
+        // Monta a estrutura do simulador uma única vez
+        preview.innerHTML = '<div class="player-bar" style="opacity:0.3; font-size:10px">SIMULADOR TOPO</div>' +
+                           '<div id="editor-preview" style="padding:25px; flex:1; overflow:hidden;"></div>' +
+                           '<div class="player-bar" style="opacity:0.3; font-size:10px">SIMULADOR BASE</div>';
+    } else { 
+        preview.className = ''; 
+        preview.style.background = '#000';
+        preview.style.borderRadius = '8px';
+        document.body.classList.remove('ipad-mode-on'); 
+        preview.innerHTML = '<div id="editor-preview" style="padding:15px; min-height:200px;"></div>';
+    }
+    updateEditorPreview();
 }
 
-function toggleFullscreen() {
-    document.getElementById('show-play-screen').classList.toggle('full-mode');
+function updateEditorPreview() { 
+    var cifra = document.getElementById('ed-cifra').value;
+    // Buscamos o target. Se o simulador estiver aberto, ele pegará o de dentro do simulador.
+    var target = document.getElementById('editor-preview');
+
+    if (!target) return;
+
+    // Se estivermos no modo iPad, precisamos garantir que o target tenha altura
+    if (isIpadView) {
+        target.style.height = "880px"; 
+    } else {
+        target.style.height = "auto";
+    }
+
+    renderSongContent(target, cifra, edColumns, edFontSize, edLineHeight, 0); 
 }
 
 function renderSongContent(container, cifraText, columns, fontSize, spacing, tp) {
-    container.style.columnCount = columns;
+    // 1. LIMPEZA E OCULTAÇÃO (Evita que o Safari tente renderizar enquanto montamos)
+    container.innerHTML = '';
+    container.style.display = 'none'; 
+
+    // 2. O SEGREDO DO IPAD ANTIGO: Altura Fixa
+    // No Safari antigo, se a altura for 'auto', ele ignora as colunas.
+    // Precisamos definir uma altura para o texto "bater no teto" e pular para o lado.
+    if (columns > 1) {
+        // Se estivermos no simulador ou no player, usamos a altura do iPad
+        container.style.height = "860px"; 
+        container.style.webkitColumnFill = "auto";
+        container.style.columnFill = "auto";
+    } else {
+        container.style.height = "auto";
+    }
+
+    // 3. APLICAÇÃO DE ESTILOS (Com todos os prefixos possíveis)
+    var colCount = columns || 1;
     container.style.fontSize = fontSize + 'px';
     container.style.lineHeight = spacing;
-    var sections = cifraText.split('\n---\n'), finalHtml = '';
+    
+    // Aplicando colunas
+    container.style.webkitColumnCount = colCount;
+    container.style.mozColumnCount = colCount;
+    container.style.columnCount = colCount;
+
+    // 4. GERAÇÃO DO HTML
+    var sections = cifraText.split('\n---\n');
+    var finalHtml = '';
+
     for (var i = 0; i < sections.length; i++) {
-        var paragraphs = sections[i].split('\n\n'), colStyle = i > 0 ? 'style="-webkit-column-break-before: always; break-before: column;"' : '';
-        finalHtml += '<div ' + colStyle + '>';
+        var paragraphs = sections[i].split('\n\n');
+        
+        // Se houver '---', forçamos a quebra de coluna na próxima div
+        var colBreakStyle = i > 0 ? 'style="-webkit-column-break-before: always; break-before: column;"' : '';
+        
+        finalHtml += '<div ' + colBreakStyle + '>';
+
         for (var j = 0; j < paragraphs.length; j++) {
-            if (!paragraphs[j].trim()) continue;
+            var pText = paragraphs[j].trim();
+            if (!pText) continue;
+
+            // A classe 'verse-block' deve ter 'break-inside: avoid' no CSS
             finalHtml += '<div class="verse-block">';
-            var lines = paragraphs[j].split('\n');
-            for (var k = 0; k < lines.length; k++) finalHtml += formatLine(lines[k], tp);
+            var lines = pText.split('\n');
+
+            for (var k = 0; k < lines.length; k++) {
+                finalHtml += formatLine(lines[k], tp);
+            }
             finalHtml += '</div>';
         }
         finalHtml += '</div>';
     }
+
+    // 5. INJEÇÃO E RE-EXIBIÇÃO (Força o motor gráfico a redesenhar tudo)
     container.innerHTML = finalHtml;
+    container.style.display = 'block';
+
+    // 6. TRUQUE FINAL DE REFLOW (Força o cálculo de layout)
+    void container.offsetHeight; 
 }
 
 function formatLine(t, tp) {
     if (t.trim().indexOf('!') === 0) return '<div class="note-box">' + esc(t.substring(1)) + '</div>';
     if (!t.trim()) return '<div style="height:6px"></div>';
-    
     var chordRegex = /^[A-G](#|b)?(m|min|maj|M|dim|aug|sus|add|alt|Δ|°|[0-9]|\+|\-|\(|\))*(\/[A-G](#|b)?)?$/;
     var tokens = t.trim().split(/\s+/);
-    var isChordLine = tokens.every(function(tk) { return chordRegex.test(tk); });
-
+    var isChordLine = true;
+    for(var i=0; i<tokens.length; i++) { if(!chordRegex.test(tokens[i])) { isChordLine = false; break; } }
     if (isChordLine) {
         var rendered = t.replace(/[A-G](#|b)?([a-zA-Z0-9\(\)\+\-\Δ\°]*)(\/[A-G](#|b)?)?/g, function(m) { 
             return tp === 0 ? m : transposeChord(m, tp); 
@@ -214,9 +340,7 @@ function transposeChord(chord, steps) {
     return chord.split('/').map(function(part) {
         var match = part.match(/^([A-G][#b]?)(.*)$/);
         if (!match) return part;
-        var root = match[1];
-        var rest = match[2];
-        var idx = notesSharp.indexOf(root);
+        var root = match[1], rest = match[2], idx = notesSharp.indexOf(root);
         if (idx === -1) idx = notesFlat.indexOf(root);
         if (idx === -1) return part;
         var newIdx = (idx + steps + 12) % 12;
@@ -224,104 +348,54 @@ function transposeChord(chord, steps) {
     }).join('/');
 }
 
-function renderBiblioteca() {
-    var div = document.getElementById('biblioteca-list');
-    var filtradas = library.filter(function(m) { return (m.title.toLowerCase().indexOf(searchTerm) > -1 || m.artist.toLowerCase().indexOf(searchTerm) > -1) && (!currentArtistFilter || m.artist === currentArtistFilter); });
-    div.innerHTML = filtradas.map(function(m) {
-        return '<div class="card-song"><div onclick="viewSingleSong(' + m.id + ')" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">' + esc(m.title) + '</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">' + esc(m.artist) + '</div></div>' +
-            '<div style="display:flex;"><button onclick="openAddToShow(' + m.id + ')" style="background:none; border:none; color:#22c55e; padding:8px; font-size:18px;">➕</button>' +
-            '<button onclick="editMusic(' + m.id + ')" style="background:none; border:none; color:#3b82f6; padding:8px; font-size:18px;">✏️</button>' +
-            '<button onclick="deleteMusic(' + m.id + ')" style="background:none; border:none; color:#ef4444; padding:8px; font-size:18px;">🗑</button></div></div>';
-    }).join('');
-    renderArtistTabs();
-}
-
-function renderArtistTabs() {
-    var tabs = document.getElementById('artist-tabs'), artistas = [];
-    for (var i = 0; i < library.length; i++) { if (artistas.indexOf(library[i].artist) === -1) artistas.push(library[i].artist); }
-    artistas.sort();
-    var html = '<button onclick="filterArtist(null)" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; background:' + (!currentArtistFilter ? '#22c55e' : '#1e293b') + '; color:' + (!currentArtistFilter ? '#000' : '#fff') + '; font-weight:bold;">Todos</button>';
-    artistas.forEach(function(a) { html += '<button onclick="filterArtist(\'' + esc(a) + '\')" style="padding:6px 12px; margin-right:6px; border-radius:6px; border:none; white-space:nowrap; background:' + (currentArtistFilter === a ? '#22c55e' : '#1e293b') + '; color:' + (currentArtistFilter === a ? '#000' : '#fff') + '; font-weight:bold;">' + esc(a) + '</button>'; });
-    tabs.innerHTML = html;
-}
+// RESTANTE DAS FUNÇÕES IGUAIS PARA MANTER ESTABILIDADE
+function setEdCols(v) { edColumns = v; updateEditorPreview(); }
+function changeEdFont(v) { edFontSize += v; updateEditorPreview(); }
+function changeEdSpacing(v) { edLineHeight = parseFloat((edLineHeight + v).toFixed(1)); updateEditorPreview(); }
+function toggleFullscreen() { document.getElementById('show-play-screen').classList.toggle('full-mode'); }
 
 function saveToLibrary() {
     var title = document.getElementById('ed-title').value, cifra = document.getElementById('ed-cifra').value;
-    if (!title || !cifra) return alert("Preencha Título e Cifra");
-    var song = { 
-        id: Date.now(), 
-        title: title, 
-        artist: document.getElementById('ed-artist').value || "Desconhecido", 
-        key: document.getElementById('ed-key').value, 
-        preset: document.getElementById('ed-preset').value, 
-        cifra: cifra, 
-        fontSize: edFontSize, 
-        columns: edColumns, 
-        lineHeight: edLineHeight 
-    };
-    var idx = -1; for (var i = 0; i < library.length; i++) { if (library[i].title == song.title && library[i].artist == song.artist) idx = i; }
+    if (!title || !cifra) return alert("Erro: Título/Cifra");
+    var song = { id: Date.now(), title: title, artist: document.getElementById('ed-artist').value || "Desconhecido", key: document.getElementById('ed-key').value, preset: document.getElementById('ed-preset').value, cifra: cifra, fontSize: edFontSize, columns: edColumns, lineHeight: edLineHeight };
+    var idx = -1;
+    for(var i=0; i<library.length; i++) { if(library[i].title === title && library[i].artist === song.artist) { idx = i; break; } }
     if (idx >= 0) library[idx] = song; else library.push(song);
     localStorage.setItem('biblio', JSON.stringify(library)); alert("Salvo!"); setTab('musicas');
 }
 
 function editMusic(id) {
-    var m = library.find(function(x) { return x.id == id; });
-    document.getElementById('ed-title').value = m.title; 
-    document.getElementById('ed-artist').value = m.artist;
-    document.getElementById('ed-key').value = m.key; 
-    document.getElementById('ed-preset').value = m.preset || ''; 
-    document.getElementById('ed-cifra').value = m.cifra;
-    edFontSize = m.fontSize || 18; edColumns = m.columns || 1; edLineHeight = m.lineHeight || 1.3; 
-    setTab('editor');
+    var m = null; for(var i=0; i<library.length; i++) { if(library[i].id == id) { m = library[i]; break; } }
+    document.getElementById('ed-title').value = m.title; document.getElementById('ed-artist').value = m.artist;
+    document.getElementById('ed-key').value = m.key; document.getElementById('ed-preset').value = m.preset || ''; 
+    document.getElementById('ed-cifra').value = m.cifra; edFontSize = m.fontSize || 18; 
+    edColumns = m.columns || 1; edLineHeight = m.lineHeight || 1.3; setTab('editor');
 }
-
-function exportarMasterApp() {
-    var html = document.documentElement.outerHTML;
-    var dataInjection = 'var library = ' + JSON.stringify(library) + '; var shows = ' + JSON.stringify(shows) + ';';
-    var regex = /var library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\];\s+var shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
-    if (html.match(regex)) {
-        html = html.replace(regex, dataInjection);
-        var blob = new Blob([html], { type: 'text/html' });
-        var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'TATU_PRO_IPAD.html'; a.click();
-    } else alert("Erro na exportação.");
-}
-
-function updateEditorPreview() { renderSongContent(document.getElementById('editor-preview'), document.getElementById('ed-cifra').value, edColumns, edFontSize, edLineHeight, 0); }
-function changeEdFont(v) { edFontSize += v; updateEditorPreview(); }
-function changeEdSpacing(v) { edLineHeight = parseFloat((edLineHeight + v).toFixed(1)); updateEditorPreview(); }
-function setEdCols(v) { edColumns = v; updateEditorPreview(); }
-
-function createShow() { var n = prompt("Nome do Show:"); if (!n) return; shows.push({ id: Date.now(), name: n, songs: [] }); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); }
-function renderShows() { var div = document.getElementById('shows-list'); div.innerHTML = shows.map(function(s) { return '<div class="card-song"><div><div style="font-weight:bold; color:#22c55e; font-size:18px;">' + esc(s.name) + '</div><div style="font-size:11px; font-weight:bold;">' + s.songs.length + ' MÚSICAS</div></div><div style="display:flex;"><button class="btn-ui btn-blue" style="padding:6px 12px; margin-right:8px;" onclick="playShow(' + s.id + ')">TOCAR</button><button onclick="deleteShow(' + s.id + ')" style="background:none; border:none; color:#ef4444; padding:5px; font-size:18px;">🗑</button></div></div>'; }).join(''); }
-function openAddToShow(songId) { var list = document.getElementById('modal-shows-list'); list.innerHTML = shows.length ? shows.map(function(sh) { return '<button class="btn-ui btn-ghost" style="width:100%; margin-bottom:8px; text-align:left;" onclick="addToShow(' + sh.id + ',' + songId + ')">➕ ' + esc(sh.name) + '</button>'; }).join('') : 'Crie um show primeiro!'; document.getElementById('modal-add').style.display = 'flex'; }
-function addToShow(showId, songId) { var sh = shows.find(function(x) { return x.id == showId; }), sg = library.find(function(x) { return x.id == songId; }); sh.songs.push(JSON.parse(JSON.stringify(sg))); localStorage.setItem('shows', JSON.stringify(shows)); closeModal(); alert("Adicionado!"); }
-
-function esc(t) { return t ? t.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
-function closeModal() { document.getElementById('modal-add').style.display = 'none'; }
-function searchSongs() { searchTerm = document.getElementById('search-input').value.toLowerCase(); renderBiblioteca(); }
-function filterArtist(a) { currentArtistFilter = a; renderBiblioteca(); }
-function transposeUp() { transpose++; renderPlay(); }
-function transposeDown() { transpose--; renderPlay(); }
-function playPrev() { if (playIndex > 0) { playIndex--; renderPlay(); } }
-function playNext() { if (playIndex < currentShowSongs.length - 1) { playIndex++; renderPlay(); } }
-function backToMenu() { if (scrollInterval) toggleScroll(); document.getElementById('show-play-screen').classList.remove('active'); document.getElementById('show-play-screen').classList.remove('full-mode'); }
-function viewSingleSong(id) { var m = library.find(function(x) { return x.id == id; }); currentShowSongs = [m]; playIndex = 0; transpose = 0; openPlayer(); }
-function playShow(id) { var s = shows.find(function(x) { return x.id == id; }); if (s.songs.length) { currentShowSongs = s.songs; playIndex = 0; transpose = 0; openPlayer(); } }
-function openPlayer() { document.getElementById('show-play-screen').classList.add('active'); renderPlay(); }
 
 function renderPlay() {
     var s = currentShowSongs[playIndex];
+
     document.getElementById('play-title').textContent = s.title;
-    
-    // Renderiza Meta com Preset Neon
+
     var metaHtml = s.artist + " • Tom: " + (s.key || 'N/A');
-    if (s.preset) {
-        metaHtml += ' <span class="preset-badge">' + esc(s.preset) + '</span>';
-    }
+    if (s.preset) metaHtml += ' <span class="preset-badge">' + esc(s.preset) + '</span>';
+
     document.getElementById('play-meta').innerHTML = metaHtml;
-    
     document.getElementById('transpose-val').textContent = transpose;
-    renderSongContent(document.getElementById('play-lyrics'), s.cifra, s.columns || 1, s.fontSize || 18, s.lineHeight || 1.3, transpose);
+
+    renderSongContent(
+        document.getElementById('play-lyrics'),
+        s.cifra,
+        s.columns || 1,
+        s.fontSize || 18,
+        s.lineHeight || 1.3,
+        transpose
+    );
+
+    document.getElementById('play-lyrics').scrollTop = 0;
+
+    // 👇 ADICIONA ISSO AQUI
+    renderShows();
 }
 
 function toggleScroll() {
@@ -329,11 +403,149 @@ function toggleScroll() {
     if (scrollInterval) { clearInterval(scrollInterval); scrollInterval = null; btn.textContent = '▶'; }
     else { btn.textContent = '⏸'; scrollInterval = setInterval(function() { container.scrollTop += 1; }, 50); }
 }
-function deleteMusic(id) { if (confirm("Excluir?")) { library = library.filter(function(x) { return x.id != id; }); localStorage.setItem('biblio', JSON.stringify(library)); renderBiblioteca(); } }
-function deleteShow(id) { if (confirm("Excluir?")) { shows = shows.filter(function(x) { return x.id != id; }); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
+
+function searchSongs() { searchTerm = document.getElementById('search-input').value.toLowerCase(); renderBiblioteca(); }
+function filterArtist(a) { currentArtistFilter = a; renderBiblioteca(); }
+function esc(t) { return t ? t.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
+function closeModal() { document.getElementById('modal-add').style.display = 'none'; }
+function backToMenu() { if (scrollInterval) toggleScroll(); document.getElementById('show-play-screen').classList.remove('active'); }
+function openPlayer() { document.getElementById('show-play-screen').classList.add('active'); renderPlay(); }
+function viewSingleSong(id) { var m = null; for(var i=0; i<library.length; i++) { if(library[i].id == id) { m = library[i]; break; } } currentShowSongs = [m]; playIndex = 0; transpose = 0; openPlayer(); }
+function playShow(id) { var s = null; for(var i=0; i<shows.length; i++) { if(shows[i].id == id) { s = shows[i]; break; } } if (s && s.songs.length) { currentShowSongs = s.songs; playIndex = 0; transpose = 0; openPlayer(); } }
+function playPrev() { if (playIndex > 0) { playIndex--; renderPlay(); } }
+function playNext() { if (playIndex < currentShowSongs.length - 1) { playIndex++; renderPlay(); } }
+function transposeUp() { transpose++; renderPlay(); }
+function transposeDown() { transpose--; renderPlay(); }
+
+function renderBiblioteca() {
+    var div = document.getElementById('biblioteca-list'), filtradas = library.filter(function(m) { return (m.title.toLowerCase().indexOf(searchTerm) > -1 || m.artist.toLowerCase().indexOf(searchTerm) > -1) && (!currentArtistFilter || m.artist === currentArtistFilter); }), html = '';
+    for(var i=0; i<filtradas.length; i++) {
+        var m = filtradas[i];
+        html += '<div class="card-song"><div onclick="viewSingleSong('+m.id+')" style="flex:1"><div style="font-weight:bold; font-size:17px; color:#fff;">'+esc(m.title)+'</div><div style="font-size:11px; color:#64748b; text-transform:uppercase;">'+esc(m.artist)+'</div></div><div style="display:flex;"><button onclick="openAddToShow('+m.id+')" style="padding:8px; font-size:18px; color:#22c55e;">➕</button><button onclick="editMusic('+m.id+')" style="padding:8px; font-size:18px; color:#3b82f6;">✏️</button><button onclick="deleteMusic('+m.id+')" style="padding:8px; font-size:18px; color:#ef4444;">🗑</button></div></div>';
+    }
+    div.innerHTML = html; renderArtistTabs();
+}
+
+function renderArtistTabs() {
+    var tabs = document.getElementById('artist-tabs'), artMap = {};
+    for(var i=0; i<library.length; i++) { artMap[library[i].artist] = true; }
+    var artistas = Object.keys(artMap).sort();
+    var html = '<button onclick="filterArtist(null)" style="padding:6px 12px; margin-right:6px; border-radius:6px; background:'+(!currentArtistFilter ? '#22c55e' : '#1e293b')+'; color:'+(!currentArtistFilter ? '#000' : '#fff')+'; font-weight:bold;">Todos</button>';
+    for(var j=0; j<artistas.length; j++) {
+        var a = artistas[j];
+        html += '<button onclick="filterArtist(\''+esc(a)+'\')" style="padding:6px 12px; margin-right:6px; border-radius:6px; white-space:nowrap; background:'+(currentArtistFilter === a ? '#22c55e' : '#1e293b')+'; color:'+(currentArtistFilter === a ? '#000' : '#fff')+'; font-weight:bold;">'+esc(a)+'</button>';
+    }
+    tabs.innerHTML = html;
+}
+
+function createShow() { var n = prompt("Nome do Show:"); if (n) { shows.push({ id: Date.now(), name: n, songs: [] }); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
+function renderShows() {
+    var div = document.getElementById('shows-list'), html = '';
+
+    for(var i=0; i<shows.length; i++) {
+        var s = shows[i];
+
+        html += '<div class="card-song" style="flex-direction:column; align-items:stretch;">';
+
+        // HEADER DO SHOW
+        html += '<div style="display:flex; justify-content:space-between; align-items:center;">';
+        html += '<div>';
+        html += '<div style="font-weight:bold; color:#22c55e; font-size:18px;">'+esc(s.name)+'</div>';
+        html += '<div style="font-size:11px; font-weight:bold;">'+s.songs.length+' MÚSICAS</div>';
+        html += '</div>';
+        html += '<div>';
+        html += '<button class="btn-ui btn-blue" onclick="playShow('+s.id+')">TOCAR</button>';
+        html += '<button onclick="deleteShow('+s.id+')" style="margin-left:10px; color:#ef4444; font-size:18px;">🗑</button>';
+        html += '</div>';
+        html += '</div>';
+
+        // LISTA DE MÚSICAS
+        html += '<div style="margin-top:10px;">';
+
+        for(var j=0; j<s.songs.length; j++) {
+            var song = s.songs[j];
+
+            var isPlaying = (
+                currentShowSongs === s.songs &&
+                playIndex === j
+            );
+
+            html += '<div style="display:flex; align-items:center; justify-content:space-between; padding:6px; border-bottom:1px solid #1e293b;' + (isPlaying ? ' background:#22c55e22;' : '') + '">';
+
+            html += '<div style="flex:1;">'+(j+1)+'. '+esc(song.title)+'</div>';
+
+            // 👇 BOTÕES ARRUMADOS AQUI
+            html += '<div style="display:flex; align-items:center; gap:6px;">';
+
+            html += '<button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong('+i+','+j+',-1)">⬆</button>';
+
+            html += '<button class="btn-ui btn-ghost" style="padding:6px 10px;" onclick="moveSong('+i+','+j+',1)">⬇</button>';
+
+            html += '<button class="btn-ui btn-ghost" style="padding:6px 10px; color:#ef4444;" onclick="removeFromShow('+i+','+j+')">✖</button>';
+
+            html += '</div>';
+
+            html += '</div>';
+        }
+
+        html += '</div>';
+        html += '</div>';
+    }
+
+    div.innerHTML = html;
+}
+function moveSong(showIndex, songIndex, direction) {
+    var s = shows[showIndex];
+    var newIndex = songIndex + direction;
+
+    if (newIndex < 0 || newIndex >= s.songs.length) return;
+
+    var temp = s.songs[songIndex];
+    s.songs[songIndex] = s.songs[newIndex];
+    s.songs[newIndex] = temp;
+
+    localStorage.setItem('shows', JSON.stringify(shows));
+    renderShows();
+}
+
+function removeFromShow(showIndex, songIndex) {
+    if (!confirm("Remover música do show?")) return;
+
+    shows[showIndex].songs.splice(songIndex, 1);
+
+    localStorage.setItem('shows', JSON.stringify(shows));
+    renderShows();
+}
+
+function openAddToShow(songId) {
+    var list = document.getElementById('modal-shows-list'), html = '';
+    if(!shows.length) html = 'Crie um show primeiro!';
+    else { for(var i=0; i<shows.length; i++) { html += '<button class="btn-ui btn-ghost" style="width:100%; margin-bottom:8px; text-align:left;" onclick="addToShow('+shows[i].id+','+songId+')">➕ '+esc(shows[i].name)+'</button>'; } }
+    list.innerHTML = html; document.getElementById('modal-add').style.display = 'flex';
+}
+function addToShow(showId, songId) {
+    var sh = null, sg = null;
+    for(var i=0; i<shows.length; i++){ if(shows[i].id == showId) sh = shows[i]; }
+    for(var j=0; j<library.length; j++){ if(library[j].id == songId) sg = library[j]; }
+   if (!sh || !sg) return;
+sh.songs.push(JSON.parse(JSON.stringify(sg))); localStorage.setItem('shows', JSON.stringify(shows));
+    closeModal(); alert("Adicionado!");
+}
+
+function exportarMasterApp() {
+    var html = document.documentElement.outerHTML;
+    var dataInjection = 'var library = ' + JSON.stringify(library) + '; var shows = ' + JSON.stringify(shows) + ';';
+    var regex = /var library = JSON\.parse\(localStorage\.getItem\('biblio'\)\) \|\| \[\];\s+var shows = JSON\.parse\(localStorage\.getItem\('shows'\)\) \|\| \[\];/;
+    html = html.replace(regex, dataInjection);
+    var blob = new Blob([html], { type: 'text/html' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'TATU_PRO_IPAD.html'; a.click();
+}
+
+function deleteMusic(id) { if (confirm("Excluir?")) { library = library.filter(function(x){ return x.id != id; }); localStorage.setItem('biblio', JSON.stringify(library)); renderBiblioteca(); } }
+function deleteShow(id) { if (confirm("Excluir?")) { shows = shows.filter(function(x){ return x.id != id; }); localStorage.setItem('shows', JSON.stringify(shows)); renderShows(); } }
 function clearEditor() { document.getElementById('ed-title').value=''; document.getElementById('ed-artist').value=''; document.getElementById('ed-cifra').value=''; document.getElementById('ed-preset').value=''; updateEditorPreview(); }
 
 renderBiblioteca();
 </script>
 
-</body></html>
+</div></body></html>
